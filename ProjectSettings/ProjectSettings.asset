@@ -621,10 +621,10 @@ PlayerSettings:
     m_VersionCode: 1
     m_VersionName: 
   apiCompatibilityLevel: 6
-  cloudProjectId: 
+  cloudProjectId: 6c0e9d26-b48d-4594-a4f3-591655968ead
   framebufferDepthMemorylessMode: 0
-  projectName: 
-  organizationId: 
+  projectName: Super Awesome Fight Game
+  organizationId: sebsmgzz
   cloudEnabled: 0
   enableNativePlatformBackendsForNewInputSystem: 0
   disableOldInputManagerSupport: 0
