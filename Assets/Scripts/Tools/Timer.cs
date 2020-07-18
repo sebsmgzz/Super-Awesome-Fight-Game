@@ -88,7 +88,7 @@ public class Timer : MonoBehaviour
     /// Update is called once per frame
     /// </summary>
     void Update()
-    {   
+    {
         // update timer and check for finished
         if (running)
         {
@@ -144,6 +144,14 @@ public class Timer : MonoBehaviour
     public void AddTimerFinishedListener(UnityAction listener)
     {
         timerFinished.AddListener(listener);
+    }
+
+    /// <summary>
+    /// Removes all non-persist listeners from the event
+    /// </summary>
+    public void RemoveAllTimerFinishedListeners()
+    {
+        timerFinished.RemoveAllListeners();
     }
 
     #endregion
