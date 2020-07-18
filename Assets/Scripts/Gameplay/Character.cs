@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.Events;
 
 public class Character : MonoBehaviour
 {
@@ -7,23 +8,78 @@ public class Character : MonoBehaviour
         
     // components
     Rigidbody2D rb2d;
+    ControlsManager controls;
+
+    // events
+    DamageMade damageMadeEvent = new DamageMade();
 
     #endregion
 
     #region Unity API
 
-    void Start()
+    public void Start()
     {
-        // controls
-        gameObject.AddComponent<IdleControl>();
-        gameObject.AddComponent<RunControl>();
-        gameObject.AddComponent<JumpControl>();
-        gameObject.AddComponent<CrouchControl>();
-        gameObject.AddComponent<AttackControl>();
-        gameObject.AddComponent<DefendControl>();
-        gameObject.AddComponent<ThrowControl>();
         // components
         rb2d = GetComponent<Rigidbody2D>();
+        controls = GetComponent<ControlsManager>();
+        // events
+        EventManager.AddDamageMadeInvoker(this);
+        EventManager.AddEmptyHealthListener(HandleEmptyHealthEvent);
+    }
+
+    private void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (controls == null)
+            return;
+        if(controls.Attacking)
+        {
+            switch (collision.gameObject.tag)
+            {
+                case "Enemy":
+                    damageMadeEvent.Invoke(Fighter.Enemy);
+                    break;
+                case "Player":
+                    damageMadeEvent.Invoke(Fighter.Player);
+                    break;
+            }
+        }
+    }
+
+    #endregion
+
+    #region Methods
+
+    /// <summary>
+    /// Adds a listener to call when damage is taken
+    /// </summary>
+    /// <param name="listener"></param>
+    public void AddDamageMadeListener(UnityAction<Fighter> listener)
+    {
+        damageMadeEvent.AddListener(listener);
+    }
+
+    /// <summary>
+    /// Handles when a healthbar is emptied
+    /// </summary>
+    /// <param name="fighterEmptied">The fighter whose health bar was emptied</param>
+    public void HandleEmptyHealthEvent(Fighter fighterEmptied)
+    {
+        string fighterEmptiedTag;
+        switch (fighterEmptied)
+        {
+            case Fighter.Enemy:
+                fighterEmptiedTag = "Enemy";
+                break;
+            case Fighter.Player:
+                fighterEmptiedTag = "Player";
+                break;
+            default:
+                return;
+        }
+        if(gameObject.CompareTag(fighterEmptiedTag))
+        {
+            Destroy(gameObject);
+        }
     }
 
     #endregion

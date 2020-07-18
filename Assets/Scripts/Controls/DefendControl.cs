@@ -13,9 +13,9 @@ public class DefendControl : MonoBehaviour
     bool defending = false;
 
     // animations names
-    string defaultAnimationName = "Idle";
+    string defaultAnimationName = "Idling";
     string defendAnimationName = "Defend";
-    string defendReversedAnimationName = "Defende_Reversed";
+    string defendReversedAnimationName = "Defend_Reversed";
 
     #endregion
 
