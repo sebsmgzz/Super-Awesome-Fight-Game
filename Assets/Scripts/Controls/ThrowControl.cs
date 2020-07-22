@@ -12,6 +12,7 @@ public class ThrowControl : MonoBehaviour
     // animations name
     private string defaultAnimationName = "Idling";
     private string throwAnimationName = "Throw";
+    private float throwAnimationDuration =ConfigurationManager.ThrowAnimationDuration;
 
     #endregion
 
@@ -23,7 +24,7 @@ public class ThrowControl : MonoBehaviour
         animator = gameObject.GetComponent<Animator>();
         // timer
         timer = gameObject.AddComponent<Timer>();
-        timer.Duration = 1f;
+        timer.Duration = throwAnimationDuration;
         timer.AddTimerFinishedListener(HandleTimerFinished);
     }
 
@@ -46,4 +47,5 @@ public class ThrowControl : MonoBehaviour
     }
 
     #endregion
+
 }

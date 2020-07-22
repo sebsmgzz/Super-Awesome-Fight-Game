@@ -9,9 +9,10 @@ public class AttackControl : MonoBehaviour
     private Animator animator;
     private Timer attackTimer;
 
-    // animation name
+    // animation
     private string defaultAnimationName = "Idling";
     private string attackAnimatorName = "Attack";
+    private float attackAnimationDuration = ConfigurationManager.AttackAnimationDuration;
 
     // flags
     private bool attacking = false;
@@ -38,7 +39,7 @@ public class AttackControl : MonoBehaviour
         animator = gameObject.GetComponent<Animator>();
         // timer
         attackTimer = gameObject.GetComponent<Timer>();
-        attackTimer.Duration = 0.8f;
+        attackTimer.Duration = attackAnimationDuration;
         attackTimer.AddTimerFinishedListener(HandleTimerFinished);
     }
 

@@ -23,8 +23,8 @@ public class Character : MonoBehaviour
         rb2d = GetComponent<Rigidbody2D>();
         controls = GetComponent<ControlsManager>();
         // events
-        EventManager.AddDamageMadeInvoker(this);
-        EventManager.AddEmptyHealthListener(HandleEmptyHealthEvent);
+        EventsManager.AddDamageMadeInvoker(this);
+        EventsManager.AddEmptyHealthListener(HandleEmptyHealthEvent);
     }
 
     private void OnCollisionEnter2D(Collision2D collision)

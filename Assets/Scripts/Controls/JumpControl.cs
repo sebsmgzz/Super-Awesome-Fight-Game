@@ -19,7 +19,8 @@ public class JumpControl : MonoBehaviour
     bool isJumping = false;
 
     // configuration
-    float jumpForceMagnitude = 7f;
+    float jumpForceMagnitude = ConfigurationManager.JumpForceMagnitude;
+    float jumpAnimationDuration = ConfigurationManager.JumpAnimationDuration;
 
     #endregion
 
@@ -32,7 +33,7 @@ public class JumpControl : MonoBehaviour
         rb2d = gameObject.GetComponent<Rigidbody2D>();
         // timer
         timer = gameObject.AddComponent<Timer>();
-        timer.Duration = 0.1f;
+        timer.Duration = jumpAnimationDuration;
         timer.AddTimerFinishedListener(HandleTimerFinished);
     }
 

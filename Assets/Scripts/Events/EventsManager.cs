@@ -7,7 +7,7 @@ using UnityEngine.Events;
 /// <summary>
 /// Th event manager
 /// </summary>
-public static class EventManager
+public static class EventsManager
 {
 
     #region DamageMade

@@ -14,7 +14,7 @@ public class RunControl : MonoBehaviour
     private string runAnimationName = "Running";
 
     // configuration
-    private float runForceMagnitude = 0.7f;
+    private float runForceMagnitude = ConfigurationManager.RunForceMagnitude;
 
     #endregion
 
@@ -81,9 +81,10 @@ public class RunControl : MonoBehaviour
     private void Run(Direction direction)
     {
         float dir = (direction == Direction.Left)? -1 : 1;
-        rb2d.AddForce(
-            new Vector2(dir * runForceMagnitude, 0),
-            ForceMode2D.Impulse);
+        //rb2d.AddForce(
+        //    new Vector2(dir * runForceMagnitude, 0),
+        //    ForceMode2D.Impulse);
+        rb2d.velocity = new Vector2(dir * 4 * runForceMagnitude, rb2d.velocity.y);
     }
 
     #endregion

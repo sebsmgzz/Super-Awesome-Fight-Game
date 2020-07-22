@@ -55,13 +55,13 @@ public class HealthBar : MonoBehaviour
         switch(position)
         {
             case Direction.Left:
-                positionX = Utilities.Screen.Left;
+                positionX = ScreenUtilities.Left;
                 break;
             case Direction.Right:
-                positionX = Utilities.Screen.Right;
+                positionX = ScreenUtilities.Right;
                 break;
         }
-        float positionY = Utilities.Screen.Top;
+        float positionY = ScreenUtilities.Top;
         gameObject.transform.position = 
             new Vector2(positionX, positionY);
     }

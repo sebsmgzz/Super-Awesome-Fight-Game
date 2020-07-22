@@ -10,12 +10,14 @@ public class DefendControl : MonoBehaviour
     private Timer timer;
 
     // flags
-    bool defending = false;
+    private bool defending = false;
 
     // animations names
-    string defaultAnimationName = "Idling";
-    string defendAnimationName = "Defend";
-    string defendReversedAnimationName = "Defend_Reversed";
+    private string defaultAnimationName = "Idling";
+    private string defendAnimationName = "Defend";
+    private string defendReversedAnimationName = "Defend_Reversed";
+    private float defendAnimationDuration = ConfigurationManager.DefendAnimationDuration;
+
 
     #endregion
 
@@ -27,7 +29,7 @@ public class DefendControl : MonoBehaviour
         animator = gameObject.GetComponent<Animator>();
         // timers
         timer = gameObject.GetComponent<Timer>();
-        timer.Duration = 1f;
+        timer.Duration = defendAnimationDuration;
         timer.AddTimerFinishedListener(HandleTimerFinished);
     }
 

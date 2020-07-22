@@ -5,7 +5,8 @@ public class GameInitializer : MonoBehaviour
 
     private void Awake()
     {
-        Utilities.Initialize();
+        ScreenUtilities.Initialize();
+        ConfigurationManager.Initialize();
     }
 
 }

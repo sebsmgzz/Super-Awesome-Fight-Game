@@ -26,8 +26,8 @@ public class HUD : MonoBehaviour
         healthBars.Add(Fighter.Enemy, bars[0]);
         healthBars.Add(Fighter.Player, bars[1]);
         // events
-        EventManager.AddDamageMadeListener(HandleDamageMadeEvent);
-        EventManager.AddEmptyHealthInvoker(this);
+        EventsManager.AddDamageMadeListener(HandleDamageMadeEvent);
+        EventsManager.AddEmptyHealthInvoker(this);
     }
 
     #endregion
