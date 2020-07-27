@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.IO;
 using UnityEngine;
 
@@ -12,14 +11,8 @@ public class ConfigurationData
     private const string ConfigurationDataFileName = "ConfigurationData.csv";
 
     // animations magnitudes
-    private static float runForceMagnitude = 0.7f;
+    private static float runForceMagnitude = 1.4f;
     private static float jumpForceMagnitude = 7f;
-
-    // animations durations
-    private static float attackAnimationDuration = 0.8f;
-    private static float defendAnimationDuration = 1f;
-    private static float jumpAnimationDuration = 0.1f;
-    private static float throwAnimationDuration = 1f;
 
     #endregion
 
@@ -27,10 +20,6 @@ public class ConfigurationData
 
     public float RunForceMagnitude => runForceMagnitude;
     public float JumpForceMagnitude => jumpForceMagnitude;
-    public float AttackAnimationDuration => attackAnimationDuration;
-    public float DefendAnimationDuration => defendAnimationDuration;
-    public float JumpAnimationDuration => jumpAnimationDuration;
-    public float ThrowAnimationDuration => throwAnimationDuration;
 
     #endregion
 
@@ -52,6 +41,7 @@ public class ConfigurationData
             {
                 string[] lines = line.Split(',');
                 CSVvalues[lines[0]] = lines[1];
+                line = configReader.ReadLine();
             }
             SetConfigurationDataFields(CSVvalues);
         }
@@ -73,13 +63,10 @@ public class ConfigurationData
     /// Sets the fields from the given dictionary
     /// </summary>
     /// <param name="values">The dictionary containing the values</param>
-    static void SetConfigurationDataFields(Dictionary<string, string> values)
+    private static void SetConfigurationDataFields(Dictionary<string, string> values)
     {
         runForceMagnitude = float.Parse(values["runForceMagnitude"]);
         jumpForceMagnitude = float.Parse(values["jumpForceMagnitude"]);
-        attackAnimationDuration = float.Parse(values["attackAnimationDuration"]);
-        defendAnimationDuration = float.Parse(values["defendAnimationDuration"]);
-        jumpAnimationDuration = float.Parse(values["jumpAnimationDuration"]);
     }
 
     #endregion

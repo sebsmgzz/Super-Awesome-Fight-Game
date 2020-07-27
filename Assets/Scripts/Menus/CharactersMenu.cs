@@ -1,8 +1,4 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.SceneManagement;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 public class CharactersMenu : MonoBehaviour
@@ -11,10 +7,9 @@ public class CharactersMenu : MonoBehaviour
     #region Fields
 
     [SerializeField]
-    private GameObject selectedCharacterTextGameObject;
-    private Text selectedCharacterText;
-    private string selectedCharacterTextPre = "Selected character:\n";
-    private CharacterName selectedCharacter;
+    private GameObject displayGameObject;
+    private Text displayText;
+    private string displayPre = "Selected character:\n";
 
     #endregion
 
@@ -22,7 +17,8 @@ public class CharactersMenu : MonoBehaviour
 
     private void Start()
     {
-        selectedCharacterText = selectedCharacterTextGameObject.GetComponent<Text>();
+        displayText = displayGameObject.GetComponent<Text>();
+        displayText.text = displayPre + (CharacterName)PlayerPrefs.GetInt("CharacterName");
     }
 
     #endregion
@@ -31,14 +27,13 @@ public class CharactersMenu : MonoBehaviour
 
     public void HandleCharacterButtonOnClickEvent(GameObject gameObject)
     {
-        selectedCharacter = GetCharacterName(gameObject.name);
-        selectedCharacterText.text = selectedCharacterTextPre + gameObject.name;
-        Debug.Log(selectedCharacter);
+        PlayerPrefs.SetInt("CharacterName", (int)GetCharacterName(gameObject.name));
+        displayText.text = displayPre + gameObject.name;
     }
 
     public void HandlePlayButtonOnClickEvent()
     {
-
+        MenuManager.GoToMenu(MenuName.Gameplay);
     }
 
     private CharacterName GetCharacterName(string buttonGameObjectName)

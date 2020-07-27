@@ -8,6 +8,7 @@ public class HealthBar : MonoBehaviour
 
     // components
     private Slider slider;
+    private Text text;
 
     #endregion
 
@@ -21,14 +22,24 @@ public class HealthBar : MonoBehaviour
         get { return slider.value; }
     }
 
+    /// <summary>
+    /// The text of the health bar
+    /// </summary>
+    public string Text
+    {
+        get { return text.text; }
+        set { text.text = value; }
+    }
+
     #endregion
 
     #region Unity API
 
-    void Start()
+    private void Start()
     {
         // components
         slider = gameObject.GetComponent<Slider>();
+        text = gameObject.GetComponentInChildren<Text>();
         // startup
         slider.value = slider.maxValue;
     }
@@ -49,15 +60,15 @@ public class HealthBar : MonoBehaviour
     /// Sets the location of the healthbar
     /// </summary>
     /// <param name="position"></param>
-    public void SetPosition(Direction position)
+    public void SetPosition(Fighter fighter)
     {
         float positionX = 0;
-        switch(position)
+        switch(fighter)
         {
-            case Direction.Left:
+            case Fighter.Enemy:
                 positionX = ScreenUtilities.Left;
                 break;
-            case Direction.Right:
+            case Fighter.Player:
                 positionX = ScreenUtilities.Right;
                 break;
         }

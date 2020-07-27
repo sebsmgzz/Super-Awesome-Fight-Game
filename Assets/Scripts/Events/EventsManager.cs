@@ -12,12 +12,12 @@ public static class EventsManager
 
     #region DamageMade
 
-    private static List<Character> damageMadeInvokers = 
-        new List<Character>();
+    private static List<Player> damageMadeInvokers = 
+        new List<Player>();
     private static List<UnityAction<Fighter>> damageMadeListeners = 
         new List<UnityAction<Fighter>>();
 
-    public static void AddDamageMadeInvoker(Character invoker)
+    public static void AddDamageMadeInvoker(Player invoker)
     {
         damageMadeInvokers.Add(invoker);
         foreach (UnityAction<Fighter> listener in damageMadeListeners)
@@ -29,7 +29,7 @@ public static class EventsManager
     public static void AddDamageMadeListener(UnityAction<Fighter> listener)
     {
         damageMadeListeners.Add(listener);
-        foreach (Character invoker in damageMadeInvokers)
+        foreach (Player invoker in damageMadeInvokers)
         {
             invoker.AddDamageMadeListener(listener);
         }

@@ -25,6 +25,11 @@ public class HUD : MonoBehaviour
         HealthBar[] bars = gameObject.GetComponentsInChildren<HealthBar>();
         healthBars.Add(Fighter.Enemy, bars[0]);
         healthBars.Add(Fighter.Player, bars[1]);
+        // name
+        CharacterName characterName = (CharacterName)PlayerPrefs.GetInt("CharacterName");
+        bars[1].Text = characterName.ToString();
+        // debug
+        DifficultyLevel difficultyLevel = (DifficultyLevel)PlayerPrefs.GetInt("DifficultyLevel");
         // events
         EventsManager.AddDamageMadeListener(HandleDamageMadeEvent);
         EventsManager.AddEmptyHealthInvoker(this);

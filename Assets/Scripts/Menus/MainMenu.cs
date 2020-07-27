@@ -2,7 +2,12 @@
 
 public class MainMenu : MonoBehaviour
 {
-    
+
+    private void Start()
+    {
+        
+    }
+
     public void HandlePlayButtonOnClickEvent()
     {
         MenuManager.GoToMenu(MenuName.Difficulty);

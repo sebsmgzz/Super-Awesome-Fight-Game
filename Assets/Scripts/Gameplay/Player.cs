@@ -1,14 +1,14 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 
-public class Character : MonoBehaviour
+public class Player : MonoBehaviour
 {
 
     #region Fields
         
     // components
     Rigidbody2D rb2d;
-    ControlsManager controls;
+    PlayerStatesManager psm;
 
     // events
     DamageMade damageMadeEvent = new DamageMade();
@@ -21,7 +21,7 @@ public class Character : MonoBehaviour
     {
         // components
         rb2d = GetComponent<Rigidbody2D>();
-        controls = GetComponent<ControlsManager>();
+        psm = GetComponent<PlayerStatesManager>();
         // events
         EventsManager.AddDamageMadeInvoker(this);
         EventsManager.AddEmptyHealthListener(HandleEmptyHealthEvent);
@@ -29,9 +29,9 @@ public class Character : MonoBehaviour
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (controls == null)
+        if (psm == null)
             return;
-        if(controls.Attacking)
+        if(psm.Attacking)
         {
             switch (collision.gameObject.tag)
             {

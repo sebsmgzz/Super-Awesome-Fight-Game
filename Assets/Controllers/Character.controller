@@ -7,7 +7,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Attack
+  m_Name: Attacking
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -33,7 +33,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Defend
+  m_Name: Covering
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -111,7 +111,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Standup
+  m_Name: Standing
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -163,7 +163,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Throw
+  m_Name: Throwing
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -237,7 +237,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Land
+  m_Name: Landing
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -263,7 +263,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Defend_Reversed
+  m_Name: Uncovering
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -315,7 +315,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Crouch
+  m_Name: Crouching
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
@@ -341,7 +341,7 @@ AnimatorState:
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_Name: Jump
+  m_Name: Launching
   m_Speed: 1
   m_CycleOffset: 0
   m_Transitions: []
