@@ -4,7 +4,7 @@ public struct Animation
 
     #region Fields
 
-    private Name nameVal;
+    private Case name;
     public string animatorName;
     private float length;
     private bool loops;
@@ -16,10 +16,10 @@ public struct Animation
     /// <summary>
     /// The name of the animation
     /// </summary>
-    public Name NameVal
+    public Case Name
     {
-        get { return nameVal; }
-        set { nameVal = value; }
+        get { return name; }
+        set { name = value; }
     }
 
     /// <summary>
@@ -53,9 +53,9 @@ public struct Animation
 
     #region Constructor
 
-    public Animation(Name name, string animatorName, float length, bool loops)
+    public Animation(Case name, string animatorName, float length, bool loops)
     {
-        this.nameVal = name;
+        this.name = name;
         this.animatorName = animatorName;
         this.length = length;
         this.loops = loops;
@@ -65,7 +65,7 @@ public struct Animation
 
     #region Enum
 
-    public enum Name
+    public enum Case
     {
         Crouching,
         Standing,

@@ -60,21 +60,24 @@ public class HealthBar : MonoBehaviour
     /// Sets the location of the healthbar
     /// </summary>
     /// <param name="position"></param>
-    public void SetPosition(Fighter fighter)
+    public void SetPosition(Fighter.Name fighterName)
     {
-        float positionX = 0;
-        switch(fighter)
+        switch(fighterName)
         {
-            case Fighter.Enemy:
-                positionX = ScreenUtilities.Left;
+            case Fighter.Name.Enemy:
+                gameObject.transform.position =
+                    new Vector2(
+                        ScreenUtilities.Left,
+                        ScreenUtilities.Top);
                 break;
-            case Fighter.Player:
-                positionX = ScreenUtilities.Right;
+            case Fighter.Name.Player:
+                gameObject.transform.position =
+                    new Vector2(
+                        ScreenUtilities.Right,
+                        ScreenUtilities.Top);
                 break;
         }
-        float positionY = ScreenUtilities.Top;
-        gameObject.transform.position = 
-            new Vector2(positionX, positionY);
+
     }
 
     #endregion

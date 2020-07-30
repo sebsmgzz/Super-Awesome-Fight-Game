@@ -11,7 +11,7 @@ public class ConfigurationData
     private const string ConfigurationDataFileName = "ConfigurationData.csv";
 
     // animations magnitudes
-    private static float runForceMagnitude = 1.4f;
+    private static float runForceMagnitude = 0.1f;
     private static float jumpForceMagnitude = 7f;
 
     #endregion
@@ -45,7 +45,10 @@ public class ConfigurationData
             }
             SetConfigurationDataFields(CSVvalues);
         }
-        catch { }
+        catch
+        {
+            Debug.Log("Error loading " + ConfigurationDataFileName);
+        }
         finally
         {
             if (configReader != null)

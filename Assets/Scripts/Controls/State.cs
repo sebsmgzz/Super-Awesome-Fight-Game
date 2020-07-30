@@ -38,4 +38,26 @@ public class State
 
     #endregion
 
+    #region Enums
+
+    public enum Case
+    {
+        Idling,
+        Crouching,
+        Defending,
+        Standing,
+        Covering,
+        Uncovering,
+        Launching,
+        Falling,
+        Landing,
+        Attacking,
+        FlippingLeft,
+        FlippingRight,
+        Running,
+        Throwing
+    }
+
+    #endregion
+
 }

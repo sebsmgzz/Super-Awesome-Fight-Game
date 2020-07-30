@@ -1,65 +1,88 @@
-﻿using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using UnityEngine;
+﻿using System.Collections.Generic;
 using UnityEngine.Events;
 
 /// <summary>
-/// Th event manager
+/// The event manager
 /// </summary>
 public static class EventsManager
 {
 
-    #region DamageMade
+    #region DamageTaken
 
-    private static List<Player> damageMadeInvokers = 
-        new List<Player>();
-    private static List<UnityAction<Fighter>> damageMadeListeners = 
-        new List<UnityAction<Fighter>>();
+    private static List<Fighter> damageTakenInvokers = 
+        new List<Fighter>();
+    private static List<UnityAction<Fighter.Name>> damageTakenListeners = 
+        new List<UnityAction<Fighter.Name>>();
 
-    public static void AddDamageMadeInvoker(Player invoker)
+    public static void AddDamageTakenInvoker(Fighter invoker)
     {
-        damageMadeInvokers.Add(invoker);
-        foreach (UnityAction<Fighter> listener in damageMadeListeners)
+        damageTakenInvokers.Add(invoker);
+        foreach (UnityAction<Fighter.Name> listener in damageTakenListeners)
         {
-            invoker.AddDamageMadeListener(listener);
+            invoker.AddDamageTakenListener(listener);
         }
     }
 
-    public static void AddDamageMadeListener(UnityAction<Fighter> listener)
+    public static void AddDamageTakenListener(UnityAction<Fighter.Name> listener)
     {
-        damageMadeListeners.Add(listener);
-        foreach (Player invoker in damageMadeInvokers)
+        damageTakenListeners.Add(listener);
+        foreach (Fighter invoker in damageTakenInvokers)
         {
-            invoker.AddDamageMadeListener(listener);
+            invoker.AddDamageTakenListener(listener);
         }
     }
 
     #endregion
 
-    #region EmptyHealth
+    #region HealthEmptied
 
-
-    private static List<HUD> emptyHealthInvokers =
+    private static List<HUD> healthEmptiedInvokers =
         new List<HUD>();
-    private static List<UnityAction<Fighter>> emptyHealthListeners =
-        new List<UnityAction<Fighter>>();
+    private static List<UnityAction<Fighter.Name>> healthEmptiedListeners =
+        new List<UnityAction<Fighter.Name>>();
 
-    public static void AddEmptyHealthInvoker(HUD invoker)
+    public static void AddHealthEmptiedInvoker(HUD invoker)
     {
-        emptyHealthInvokers.Add(invoker);
-        foreach (UnityAction<Fighter> listener in emptyHealthListeners)
+        healthEmptiedInvokers.Add(invoker);
+        foreach (UnityAction<Fighter.Name> listener in healthEmptiedListeners)
         {
-            invoker.AddEmptyHealthLister(listener);
+            invoker.AddHealthEmptiedLister(listener);
         }
     }
 
-    public static void AddEmptyHealthListener(UnityAction<Fighter> listener)
+    public static void AddHealthEmptiedListener(UnityAction<Fighter.Name> listener)
     {
-        emptyHealthListeners.Add(listener);
-        foreach (HUD invoker in emptyHealthInvokers)
+        healthEmptiedListeners.Add(listener);
+        foreach (HUD invoker in healthEmptiedInvokers)
         {
-            invoker.AddEmptyHealthLister(listener);
+            invoker.AddHealthEmptiedLister(listener);
+        }
+    }
+
+    #endregion
+
+    #region PlayerStartedState
+
+    private static List<Player> playerStartedStateInvokers =
+        new List<Player>();
+    private static List<UnityAction<State.Case>> playerStartedStateListeners =
+        new List<UnityAction<State.Case>>();
+
+    public static void AddPlayerStartedStateInvoker(Player invoker)
+    {
+        playerStartedStateInvokers.Add(invoker);
+        foreach (UnityAction<State.Case> listener in playerStartedStateListeners)
+        {
+            invoker.AddPlayerStartedStateListener(listener);
+        }
+    }
+
+    public static void AddPlayerStartedStateListener(UnityAction<State.Case> listener)
+    {
+        playerStartedStateListeners.Add(listener);
+        foreach (Player invoker in playerStartedStateInvokers)
+        {
+            invoker.AddPlayerStartedStateListener(listener);
         }
     }
 

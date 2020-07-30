@@ -9,11 +9,11 @@ public class HUD : MonoBehaviour
     #region Fields
 
     // content
-    Dictionary<Fighter, HealthBar> healthBars = 
-        new Dictionary<Fighter, HealthBar>();
+    Dictionary<Fighter.Name, HealthBar> healthBars = 
+        new Dictionary<Fighter.Name, HealthBar>();
 
     // events
-    EmptyHealth emptyHealthEvent = new EmptyHealth();
+    HealthEmptied healthEmptiedEvent = new HealthEmptied();
 
     #endregion
 
@@ -23,16 +23,16 @@ public class HUD : MonoBehaviour
     {
         // health bars
         HealthBar[] bars = gameObject.GetComponentsInChildren<HealthBar>();
-        healthBars.Add(Fighter.Enemy, bars[0]);
-        healthBars.Add(Fighter.Player, bars[1]);
+        healthBars.Add(Fighter.Name.Enemy, bars[0]);
+        healthBars.Add(Fighter.Name.Player, bars[1]);
         // name
         CharacterName characterName = (CharacterName)PlayerPrefs.GetInt("CharacterName");
         bars[1].Text = characterName.ToString();
         // debug
         DifficultyLevel difficultyLevel = (DifficultyLevel)PlayerPrefs.GetInt("DifficultyLevel");
         // events
-        EventsManager.AddDamageMadeListener(HandleDamageMadeEvent);
-        EventsManager.AddEmptyHealthInvoker(this);
+        EventsManager.AddDamageTakenListener(HandleDamageMadeEvent);
+        EventsManager.AddHealthEmptiedInvoker(this);
     }
 
     #endregion
@@ -40,28 +40,23 @@ public class HUD : MonoBehaviour
     #region Methods
 
     /// <summary>
-    /// Marks damage in health
+    /// Marks damage in player health
     /// </summary>
-    /// <param name="damaged"></param>
-    private void HandleDamageMadeEvent(Fighter damaged)
+    private void HandleDamageMadeEvent(Fighter.Name fighterDamaged)
     {
-        HealthBar healthBar = healthBars[damaged];
+        HealthBar healthBar = healthBars[fighterDamaged];
         // take damage
         healthBar.TakeDamage();
         // if empty invoke event
         if(healthBar.Value <= 0)
         {
-            emptyHealthEvent.Invoke(damaged);
+            healthEmptiedEvent.Invoke(fighterDamaged);
         }
     }
 
-    /// <summary>
-    /// Adds a listener to when a healthbar becomes empty
-    /// </summary>
-    /// <param name="listener">The listener</param>
-    public void AddEmptyHealthLister(UnityAction<Fighter> listener)
+    public void AddHealthEmptiedLister(UnityAction<Fighter.Name> listener)
     {
-        emptyHealthEvent.AddListener(listener);
+        healthEmptiedEvent.AddListener(listener);
     }
 
     #endregion
