@@ -18,23 +18,12 @@ public class CharactersMenu : MonoBehaviour
     private void Start()
     {
         displayText = displayGameObject.GetComponent<Text>();
-        displayText.text = displayPre + (CharacterName)PlayerPrefs.GetInt("CharacterName");
+        displayText.text = displayPre + (CharacterName)PlayerPrefs.GetInt(GameConstants.CharacterPrefKey);
     }
 
     #endregion
 
     #region Methods
-
-    public void HandleCharacterButtonOnClickEvent(GameObject gameObject)
-    {
-        PlayerPrefs.SetInt("CharacterName", (int)GetCharacterName(gameObject.name));
-        displayText.text = displayPre + gameObject.name;
-    }
-
-    public void HandlePlayButtonOnClickEvent()
-    {
-        MenuManager.GoToMenu(MenuName.Gameplay);
-    }
 
     private CharacterName GetCharacterName(string buttonGameObjectName)
     {
@@ -57,6 +46,21 @@ public class CharactersMenu : MonoBehaviour
             default:
                 return CharacterName.Undefined;
         }
+    }
+
+    #endregion
+
+    #region Event Handlers
+
+    public void HandleCharacterButtonOnClickEvent(GameObject gameObject)
+    {
+        PlayerPrefs.SetInt(GameConstants.CharacterPrefKey, (int)GetCharacterName(gameObject.name));
+        displayText.text = displayPre + gameObject.name;
+    }
+
+    public void HandlePlayButtonOnClickEvent()
+    {
+        MenuManager.GoToMenu(MenuName.Gameplay);
     }
 
     #endregion

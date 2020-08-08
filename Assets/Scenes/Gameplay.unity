@@ -138,6 +138,11 @@ PrefabInstance:
       propertyPath: m_TagString
       value: Enemy
       objectReference: {fileID: 0}
+    - target: {fileID: 4579484582781278367, guid: b0b2aed52388b6e4d946ae5604a2245c,
+        type: 3}
+      propertyPath: m_TagString
+      value: Shield
+      objectReference: {fileID: 0}
     - target: {fileID: 8241761895949774147, guid: b0b2aed52388b6e4d946ae5604a2245c,
         type: 3}
       propertyPath: m_LocalPosition.x
@@ -213,6 +218,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e85fe65bf787eb74c98772c774d79301, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sebasHead: {fileID: 21300000, guid: 17b1bad951e19724f8ea40501001f5ff, type: 3}
+  camachoHead: {fileID: 21300000, guid: 8596f6006e377544e9696d3d9a0dec66, type: 3}
+  chavarriaHead: {fileID: 21300000, guid: c43d2d6d3fc7fe14284dd385018dfb50, type: 3}
+  ramonHead: {fileID: 21300000, guid: 143f20455cc895549bed6964e18a865f, type: 3}
+  joaquinHead: {fileID: 21300000, guid: 1462aa7aff7521a47b50aaf07384f011, type: 3}
+  maritzaHead: {fileID: 21300000, guid: 3da6bd58943213c4b854c3899260c023, type: 3}
+  majoHead: {fileID: 0}
 --- !u!1001 &227762039
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -301,6 +313,7 @@ GameObject:
   - component: {fileID: 519420033}
   - component: {fileID: 519420034}
   - component: {fileID: 519420030}
+  - component: {fileID: 519420035}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -421,6 +434,18 @@ EdgeCollider2D:
   m_Points:
   - {x: 11, y: 15}
   - {x: 11, y: -5}
+--- !u!114 &519420035
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 519420028}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 60c41343c89345c4e8050fe6637ca94f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &520065385
 GameObject:
   m_ObjectHideFlags: 0
@@ -510,8 +535,8 @@ Canvas:
   m_GameObject: {fileID: 520065385}
   m_Enabled: 1
   serializedVersion: 3
-  m_RenderMode: 0
-  m_Camera: {fileID: 0}
+  m_RenderMode: 1
+  m_Camera: {fileID: 519420031}
   m_PlaneDistance: 100
   m_PixelPerfect: 1
   m_ReceivesEvents: 1
@@ -626,6 +651,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc45c037f97d3304e9487c0cf4caddaf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  sebasHead: {fileID: 21300000, guid: 17b1bad951e19724f8ea40501001f5ff, type: 3}
+  camachoHead: {fileID: 21300000, guid: 8596f6006e377544e9696d3d9a0dec66, type: 3}
+  chavarriaHead: {fileID: 21300000, guid: c43d2d6d3fc7fe14284dd385018dfb50, type: 3}
+  ramonHead: {fileID: 21300000, guid: 143f20455cc895549bed6964e18a865f, type: 3}
+  joaquinHead: {fileID: 21300000, guid: 1462aa7aff7521a47b50aaf07384f011, type: 3}
+  maritzaHead: {fileID: 21300000, guid: 3da6bd58943213c4b854c3899260c023, type: 3}
+  majoHead: {fileID: 0}
 --- !u!1001 &1304942650
 PrefabInstance:
   m_ObjectHideFlags: 0

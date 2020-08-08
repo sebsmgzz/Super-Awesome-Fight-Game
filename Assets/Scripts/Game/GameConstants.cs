@@ -2,9 +2,20 @@
 public static class GameConstants
 {
 
+    #region Preferences
+
+    public static string DifficultyPrefKey => "DifficultyLevel";
+    public static string CharacterPrefKey => "CharacterName";
+
+    #endregion
+
     #region Tags
 
     public static string PlayerTag => "Player";
+    public static string EnemyTag => "Enemy";
+    public static string PlataformTag => "Plataform";
+    public static string SwordTag => "Sword";
+    public static string ShieldTag => "Shield";
 
     #endregion
 

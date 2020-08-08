@@ -7,6 +7,8 @@ TagManager:
   - Plataform
   - Enemy
   - Sword
+  - Shield
+  - GameoverMenu
   layers:
   - Default
   - TransparentFX

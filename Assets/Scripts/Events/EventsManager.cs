@@ -7,41 +7,28 @@ using UnityEngine.Events;
 public static class EventsManager
 {
 
-    #region DamageTaken
+    #region Fields
 
-    private static List<Fighter> damageTakenInvokers = 
-        new List<Fighter>();
+    private static List<IDamageTakenInvoker> damageTakenInvokers = 
+        new List<IDamageTakenInvoker>();
     private static List<UnityAction<Fighter.Name>> damageTakenListeners = 
         new List<UnityAction<Fighter.Name>>();
 
-    public static void AddDamageTakenInvoker(Fighter invoker)
-    {
-        damageTakenInvokers.Add(invoker);
-        foreach (UnityAction<Fighter.Name> listener in damageTakenListeners)
-        {
-            invoker.AddDamageTakenListener(listener);
-        }
-    }
-
-    public static void AddDamageTakenListener(UnityAction<Fighter.Name> listener)
-    {
-        damageTakenListeners.Add(listener);
-        foreach (Fighter invoker in damageTakenInvokers)
-        {
-            invoker.AddDamageTakenListener(listener);
-        }
-    }
-
-    #endregion
-
-    #region HealthEmptied
-
-    private static List<HUD> healthEmptiedInvokers =
-        new List<HUD>();
+    private static List<IHealthEmptiedInvoker> healthEmptiedInvokers =
+        new List<IHealthEmptiedInvoker>();
     private static List<UnityAction<Fighter.Name>> healthEmptiedListeners =
         new List<UnityAction<Fighter.Name>>();
 
-    public static void AddHealthEmptiedInvoker(HUD invoker)
+    private static List<IPlayerStartedStateInvoker> playerStartedStateInvokers =
+        new List<IPlayerStartedStateInvoker>();
+    private static List<UnityAction<State.Case>> playerStartedStateListeners =
+        new List<UnityAction<State.Case>>();
+
+    #endregion
+
+    #region AddInvoker
+
+    public static void AddInvoker(IHealthEmptiedInvoker invoker)
     {
         healthEmptiedInvokers.Add(invoker);
         foreach (UnityAction<Fighter.Name> listener in healthEmptiedListeners)
@@ -50,25 +37,16 @@ public static class EventsManager
         }
     }
 
-    public static void AddHealthEmptiedListener(UnityAction<Fighter.Name> listener)
+    public static void AddInvoker(IDamageTakenInvoker invoker)
     {
-        healthEmptiedListeners.Add(listener);
-        foreach (HUD invoker in healthEmptiedInvokers)
+        damageTakenInvokers.Add(invoker);
+        foreach (UnityAction<Fighter.Name> listener in damageTakenListeners)
         {
-            invoker.AddHealthEmptiedLister(listener);
+            invoker.AddDamageTakenListener(listener);
         }
     }
 
-    #endregion
-
-    #region PlayerStartedState
-
-    private static List<Player> playerStartedStateInvokers =
-        new List<Player>();
-    private static List<UnityAction<State.Case>> playerStartedStateListeners =
-        new List<UnityAction<State.Case>>();
-
-    public static void AddPlayerStartedStateInvoker(Player invoker)
+    public static void AddInvoker(IPlayerStartedStateInvoker invoker)
     {
         playerStartedStateInvokers.Add(invoker);
         foreach (UnityAction<State.Case> listener in playerStartedStateListeners)
@@ -77,15 +55,39 @@ public static class EventsManager
         }
     }
 
+    #endregion
+
+    #region AddListener
+
+    public static void AddDamageTakenListener(UnityAction<Fighter.Name> listener)
+    {
+        damageTakenListeners.Add(listener);
+        foreach (IDamageTakenInvoker invoker in damageTakenInvokers)
+        {
+            invoker.AddDamageTakenListener(listener);
+        }
+    }
+
+    public static void AddHealthEmptiedListener(UnityAction<Fighter.Name> listener)
+    {
+        healthEmptiedListeners.Add(listener);
+        foreach (IHealthEmptiedInvoker invoker in healthEmptiedInvokers)
+        {
+            invoker.AddHealthEmptiedLister(listener);
+        }
+    }
+
     public static void AddPlayerStartedStateListener(UnityAction<State.Case> listener)
     {
         playerStartedStateListeners.Add(listener);
-        foreach (Player invoker in playerStartedStateInvokers)
+        foreach (IPlayerStartedStateInvoker invoker in playerStartedStateInvokers)
         {
             invoker.AddPlayerStartedStateListener(listener);
         }
     }
 
     #endregion
+
+
 
 }

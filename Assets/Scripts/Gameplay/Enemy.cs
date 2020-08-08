@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
-using UnityEngine.Events;
-using UnityEngine.SceneManagement;
 
 public class Enemy : Fighter
 {
@@ -16,8 +15,6 @@ public class Enemy : Fighter
     // control
     Action updateCheck;
     private Dictionary<State.Case, Action> updateChecks =
-        new Dictionary<State.Case, Action>();
-    private Dictionary<State.Case, Action> baseStatesTriggeredHandlers =
         new Dictionary<State.Case, Action>();
     private Dictionary<State.Case, bool> statesFlags = 
         new Dictionary<State.Case, bool>()
@@ -38,7 +35,8 @@ public class Enemy : Fighter
     };
 
     // config
-    private float nearDistanceTriggerer = 2f;
+    private float nearDistanceTriggerer = 2.2f;
+    private float maxVelocity = 2f;
 
     #endregion
 
@@ -46,7 +44,7 @@ public class Enemy : Fighter
 
     public override Name FighterName => Name.Enemy;
 
-    protected override float MaxVelocity => 2f;
+    protected override float MaxVelocity => maxVelocity;
 
     #endregion
 
@@ -70,6 +68,28 @@ public class Enemy : Fighter
         // initialize fields
         Initialize();
         updateCheck = updateChecks[State.Case.Idling];
+        // set head
+        base.Initialize();
+        CharacterName playerCharacterName = (CharacterName)PlayerPrefs.GetInt(GameConstants.CharacterPrefKey);
+        List<CharacterName> characterNames = Enum.GetValues(typeof(CharacterName)).Cast<CharacterName>().ToList<CharacterName>();
+        characterNames.Remove(playerCharacterName);
+        characterNames.Remove(CharacterName.Undefined);
+        characterNames.Remove(CharacterName.Majo);
+        CharacterName myCharacterName = characterNames[UnityEngine.Random.Range(0, characterNames.Count)];
+        SetHead(myCharacterName);
+        // set difficulty
+        switch((DifficultyLevel)PlayerPrefs.GetInt(GameConstants.DifficultyPrefKey))
+        {
+            case DifficultyLevel.Easy:
+                maxVelocity = 2f;
+                break;
+            case DifficultyLevel.Medium:
+                maxVelocity = 2.5f;
+                break;
+            case DifficultyLevel.Hard:
+                maxVelocity = 3f;
+                break;
+        }
     }
 
     protected override void Update()
@@ -84,26 +104,15 @@ public class Enemy : Fighter
 
     #region Methods
 
+    /// <summary>
+    /// Setupds initial configuration
+    /// </summary>
     private void Initialize()
     {
-        // base states
-        baseStatesTriggeredHandlers.Add(State.Case.Idling, base.IdleOnEnter);
-        baseStatesTriggeredHandlers.Add(State.Case.Crouching, base.CrouchingOnEnter);
-        baseStatesTriggeredHandlers.Add(State.Case.Standing, base.StandOnEnter);
-        baseStatesTriggeredHandlers.Add(State.Case.Covering, base.CoveringOnEnter);
-        baseStatesTriggeredHandlers.Add(State.Case.Uncovering, base.UncoveringOnEnter);
-        baseStatesTriggeredHandlers.Add(State.Case.Launching, base.LaunchingOnEnter);
-        baseStatesTriggeredHandlers.Add(State.Case.Falling, base.FallingOnEnter);
-        baseStatesTriggeredHandlers.Add(State.Case.Landing, base.LandingOnEnter);
-        baseStatesTriggeredHandlers.Add(State.Case.Attacking, base.AttackingOnEnter);
-        baseStatesTriggeredHandlers.Add(State.Case.FlippingLeft, base.FlippingLeftOnEnter);
-        baseStatesTriggeredHandlers.Add(State.Case.FlippingRight, base.FlippingRightOnEnter);
-        baseStatesTriggeredHandlers.Add(State.Case.Running, base.RunningOnEnter);
-        baseStatesTriggeredHandlers.Add(State.Case.Throwing, base.ThrowingOnEnter);
         // update Checks
         updateChecks.Add(State.Case.Idling, WhileIdling);
         updateChecks.Add(State.Case.Crouching, WhileCrouching);
-        updateChecks.Add(State.Case.Standing, WhileIdling);
+        updateChecks.Add(State.Case.Standing, WhileStanding);
         updateChecks.Add(State.Case.Covering, WhileCovering);
         updateChecks.Add(State.Case.Uncovering, WhileUncovering);
         updateChecks.Add(State.Case.Launching, WhileLaunching);
@@ -114,35 +123,19 @@ public class Enemy : Fighter
         updateChecks.Add(State.Case.FlippingRight, WhileFlippingRight);
         updateChecks.Add(State.Case.Running, WhileRunning);
         updateChecks.Add(State.Case.Throwing, WhileThrowing);
-    }
-
-    private void StateTriggered(State.Case stateName)
-    {
-        // base call
-        baseStatesTriggeredHandlers[stateName].Invoke();
-        // updateCheck update
-        updateCheck = updateChecks[stateName];
-    }
-
-    private void StateOnEnter(State.Case stateName)
-    {
-        // base call
-        baseStatesTriggeredHandlers[stateName].Invoke();
-        // action
-        Debug.Log(stateName);
-        statesFlags[stateName] = false;
-        updateCheck = updateChecks[stateName];
-    }
-
-    /// <summary>
-    /// Changes all flags to the given condition
-    /// </summary>
-    /// <param name="flagCondition">The condition for all flags to have</param>
-    private void SetAllFlags(bool flagCondition)
-    {
-        foreach(State.Case key in statesFlags.Keys)
+        // difficulty
+        DifficultyLevel difficultyLevel = (DifficultyLevel)PlayerPrefs.GetInt(GameConstants.DifficultyPrefKey);
+        switch (difficultyLevel)
         {
-            statesFlags[key] = flagCondition;
+            case DifficultyLevel.Easy:
+                maxVelocity = 2f;
+                break;
+            case DifficultyLevel.Medium:
+                maxVelocity = 3f;
+                break;
+            case DifficultyLevel.Hard:
+                maxVelocity = 4f;
+                break;
         }
     }
 
@@ -162,7 +155,7 @@ public class Enemy : Fighter
 
     #endregion
 
-    #region Player Responses
+    #region Event Handlers
 
     /// <summary>
     /// Handles a change in state on the player
@@ -181,47 +174,30 @@ public class Enemy : Fighter
 
     #endregion
 
-    #region Controls
+    #region Controller Overrides
+
+    protected override void StateOnEnter(State.Case stateName)
+    {
+        // updateCheck update
+        updateCheck = updateChecks[stateName];
+        // unflag
+        //Debug.Log(stateName);
+        statesFlags[stateName] = false;
+    }
 
     protected override bool IdlingTrigger() => statesFlags[State.Case.Idling];
-    protected override void IdleOnEnter() => StateOnEnter(State.Case.Idling);
-
     protected override bool CrouchingTrigger() => statesFlags[State.Case.Crouching];
-    protected override void CrouchingOnEnter() => StateOnEnter(State.Case.Crouching);
-
     protected override bool StandInputCheck() => statesFlags[State.Case.Standing];
-    protected override void StandOnEnter() => StateOnEnter(State.Case.Standing);
-
     protected override bool CoveringTrigger() => statesFlags[State.Case.Covering];
-    protected override void CoveringOnEnter() => StateOnEnter(State.Case.Covering);
-
     protected override bool UncoveringTrigger() => statesFlags[State.Case.Uncovering];
-    protected override void UncoveringOnEnter() => StateOnEnter(State.Case.Uncovering);
-
     protected override bool LaunchingTrigger() => statesFlags[State.Case.Launching];
-    protected override void LaunchingOnEnter() => StateOnEnter(State.Case.Launching);
-
     protected override bool FallingTrigger() => statesFlags[State.Case.Falling];
-    protected override void FallingOnEnter() => StateOnEnter(State.Case.Falling);
-
     protected override bool LandingTrigger() => statesFlags[State.Case.Landing];
-    protected override void LandingOnEnter() => StateOnEnter(State.Case.Landing);
-
     protected override bool FlippingLeftTrigger() => statesFlags[State.Case.FlippingLeft];
-    protected override void FlippingLeftOnEnter() => StateOnEnter(State.Case.FlippingLeft);
-
     protected override bool FlippingRightTrigger() => statesFlags[State.Case.FlippingRight];
-    protected override void FlippingRightOnEnter() => StateOnEnter(State.Case.FlippingRight);
-
     protected override bool RunningTrigger() => statesFlags[State.Case.Running];
-    protected override void RunningOnEnter() => StateOnEnter(State.Case.Running);
-
     protected override bool AttackingTrigger() => statesFlags[State.Case.Attacking];
-    protected override void AttackingOnEnter() => StateOnEnter(State.Case.Attacking);
-
     protected override bool ThrowingTrigger() => statesFlags[State.Case.Throwing];
-    protected override void ThrowingOnEnter() => StateOnEnter(State.Case.Throwing);
-
 
     #endregion
 
@@ -230,7 +206,7 @@ public class Enemy : Fighter
     private void WhileIdling()
     {
         // check run controls
-        if (!playerController.Falling)
+        if(!PlayerIsNear())
         {
             bool playerIsToRightOfEnemy =
                 gameObject.transform.position.x < playerGameObject.transform.position.x;
@@ -238,7 +214,10 @@ public class Enemy : Fighter
             statesFlags[State.Case.FlippingRight] = playerIsToRightOfEnemy;
             statesFlags[State.Case.Running] = true;
         }
-        statesFlags[State.Case.Attacking] = PlayerIsNear();
+        else
+        {
+            statesFlags[State.Case.Attacking] = true;
+        }
     }
     private void WhileCrouching() { }
     private void WhileStanding() { }
@@ -257,7 +236,7 @@ public class Enemy : Fighter
             statesFlags[State.Case.Running] = false;
             statesFlags[State.Case.Idling] = true;
         }
-        else if (!playerController.Falling)
+        else 
         {
             bool facingRight = gameObject.transform.localScale.x == -1;
             bool playerLocatedRight =

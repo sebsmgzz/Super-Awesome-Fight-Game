@@ -3,17 +3,26 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class HUD : MonoBehaviour
+public class HUD : MonoBehaviour, IHealthEmptiedInvoker
 {
 
     #region Fields
 
     // content
-    Dictionary<Fighter.Name, HealthBar> healthBars = 
+    private Dictionary<Fighter.Name, HealthBar> healthBars = 
         new Dictionary<Fighter.Name, HealthBar>();
 
     // events
-    HealthEmptied healthEmptiedEvent = new HealthEmptied();
+    private HealthEmptied healthEmptiedEvent = new HealthEmptied();
+
+    #endregion
+
+    #region IHealthEmptiedInvoker
+
+    public void AddHealthEmptiedLister(UnityAction<Fighter.Name> listener)
+    {
+        healthEmptiedEvent.AddListener(listener);
+    }
 
     #endregion
 
@@ -32,7 +41,7 @@ public class HUD : MonoBehaviour
         DifficultyLevel difficultyLevel = (DifficultyLevel)PlayerPrefs.GetInt("DifficultyLevel");
         // events
         EventsManager.AddDamageTakenListener(HandleDamageMadeEvent);
-        EventsManager.AddHealthEmptiedInvoker(this);
+        EventsManager.AddInvoker(this);
     }
 
     #endregion
@@ -52,11 +61,6 @@ public class HUD : MonoBehaviour
         {
             healthEmptiedEvent.Invoke(fighterDamaged);
         }
-    }
-
-    public void AddHealthEmptiedLister(UnityAction<Fighter.Name> listener)
-    {
-        healthEmptiedEvent.AddListener(listener);
     }
 
     #endregion

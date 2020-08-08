@@ -4,7 +4,7 @@ public static class ConfigurationManager
 
     #region Fields
 
-    private static ConfigurationData configData;
+    public static ConfigurationData configData;
 
     #endregion
 

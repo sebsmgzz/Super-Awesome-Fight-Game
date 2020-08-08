@@ -3,7 +3,14 @@ guid: 3aa5b85a4cdd6c34ca7ef1d502fadd8f
 MonoImporter:
   externalObjects: {}
   serializedVersion: 2
-  defaultReferences: []
+  defaultReferences:
+  - sebasHead: {fileID: 21300000, guid: 17b1bad951e19724f8ea40501001f5ff, type: 3}
+  - camachoHead: {fileID: 21300000, guid: 8596f6006e377544e9696d3d9a0dec66, type: 3}
+  - chavarriaHead: {fileID: 21300000, guid: c43d2d6d3fc7fe14284dd385018dfb50, type: 3}
+  - ramonHead: {fileID: 21300000, guid: 143f20455cc895549bed6964e18a865f, type: 3}
+  - joaquinHead: {fileID: 21300000, guid: 1462aa7aff7521a47b50aaf07384f011, type: 3}
+  - maritzaHead: {fileID: 21300000, guid: 3da6bd58943213c4b854c3899260c023, type: 3}
+  - majoHead: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}
   userData: 

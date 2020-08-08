@@ -5,7 +5,7 @@ public class HelpMenu : MonoBehaviour
     
     public void HandleReturnButtonOnClickEvent()
     {
-        Destroy(gameObject);
+        MenuManager.RemoveTemporalMenu(gameObject);
     }
 
 }

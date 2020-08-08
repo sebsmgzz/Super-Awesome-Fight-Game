@@ -5,19 +5,19 @@ public class DifficultyMenu : MonoBehaviour
 
     public void HandleEasyButtonOnClickEvent()
     {
-        PlayerPrefs.SetInt("DifficultyLevel", (int)DifficultyLevel.Easy);
+        PlayerPrefs.SetInt(GameConstants.DifficultyPrefKey, (int)DifficultyLevel.Easy);
         MenuManager.GoToMenu(MenuName.Characters);
     }
 
     public void HandleMediumButtonOnClickEvent()
     {
-        PlayerPrefs.SetInt("DifficultyLevel", (int)DifficultyLevel.Medium);
+        PlayerPrefs.SetInt(GameConstants.DifficultyPrefKey, (int)DifficultyLevel.Medium);
         MenuManager.GoToMenu(MenuName.Characters);
     }
 
     public void HandleHardButtonOnClickEvent()
     {
-        PlayerPrefs.SetInt("DifficultyLevel", (int)DifficultyLevel.Hard);
+        PlayerPrefs.SetInt(GameConstants.DifficultyPrefKey, (int)DifficultyLevel.Hard);
         MenuManager.GoToMenu(MenuName.Characters);
     }
 

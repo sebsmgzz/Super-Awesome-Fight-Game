@@ -93,7 +93,9 @@ public abstract class Controller : MonoBehaviour
 
     protected virtual void OnCollisionEnter2D(Collision2D collision)
     {
-        if(collision.gameObject.CompareTag("Plataform"))
+        if(    collision.gameObject.CompareTag(GameConstants.PlataformTag)
+            || collision.gameObject.CompareTag(GameConstants.EnemyTag)
+            || collision.gameObject.CompareTag(GameConstants.PlayerTag))
         {
             landed = true;
         }
@@ -104,30 +106,10 @@ public abstract class Controller : MonoBehaviour
     #region Methods
 
     /// <summary>
-    /// Flips the game object in the X axis
+    /// Called when entering a state
     /// </summary>
-    /// <param name="direction">True to the left</param>
-    private void Flip(bool toLeft)
-    {
-        Vector3 characterScale = gameObject.transform.localScale;
-        characterScale.x = (toLeft) ? 1 : -1;
-        gameObject.transform.localScale = characterScale;
-    }
-
-    /// <summary>
-    /// Applies force to run
-    /// </summary>
-    /// <param name="direction">The direction to run to</param>
-    private void Run()
-    {
-        float dir = -gameObject.transform.localScale.x;
-        if (Mathf.Abs(rb2d.velocity.x) < MaxVelocity)
-        {
-            rb2d.AddForce(
-                new Vector2(dir * runForceMagnitude, 0),
-                ForceMode2D.Impulse);
-        }
-    }
+    /// <param name="stateName">The state entered</param>
+    protected abstract void StateOnEnter(State.Case stateName);
 
     #endregion
 
@@ -221,18 +203,16 @@ public abstract class Controller : MonoBehaviour
 
     #endregion
 
-    #region Idle States
+    #region States
 
     protected abstract bool IdlingTrigger();
     protected virtual void IdleOnEnter()
     {
         // animator
         animator.Play(GameConstants.Idling.animatorName);
+        // triggered
+        StateOnEnter(State.Case.Idling);
     }
-
-    #endregion
-
-    #region Crouch States
 
     protected abstract bool CrouchingTrigger();
     protected virtual void CrouchingOnEnter()
@@ -243,6 +223,8 @@ public abstract class Controller : MonoBehaviour
         rb2d.constraints =
             RigidbodyConstraints2D.FreezeRotation |
             RigidbodyConstraints2D.FreezePositionX;
+        // triggered
+        StateOnEnter(State.Case.Crouching);
     }
 
     protected abstract bool StandInputCheck();
@@ -255,17 +237,17 @@ public abstract class Controller : MonoBehaviour
         // timer
         statesTimer.Duration = GameConstants.Standing.Length;
         statesTimer.Run();
+        // triggered
+        StateOnEnter(State.Case.Standing);
     }
-
-    #endregion
-
-    #region Defend States
 
     protected abstract bool CoveringTrigger();
     protected virtual void CoveringOnEnter()
     {
         // animator
         animator.Play(GameConstants.Covering.AnimatorName);
+        // triggered
+        StateOnEnter(State.Case.Covering);
     }
 
     protected abstract bool UncoveringTrigger();
@@ -276,11 +258,9 @@ public abstract class Controller : MonoBehaviour
         // timer
         statesTimer.Duration = GameConstants.Uncovering.Length;
         statesTimer.Run();
+        // triggered
+        StateOnEnter(State.Case.Uncovering);
     }
-
-    #endregion
-
-    #region Jump States
 
     protected abstract bool LaunchingTrigger() ;
     protected virtual void LaunchingOnEnter()
@@ -294,6 +274,8 @@ public abstract class Controller : MonoBehaviour
         // timer
         statesTimer.Duration = GameConstants.Launching.Length;
         statesTimer.Run();
+        // triggered
+        StateOnEnter(State.Case.Launching);
     }
 
     protected abstract bool FallingTrigger();
@@ -303,6 +285,8 @@ public abstract class Controller : MonoBehaviour
         animator.Play(GameConstants.Falling.AnimatorName);
         // action
         landed = false;
+        // triggered
+        StateOnEnter(State.Case.Falling);
     }
 
     protected abstract bool LandingTrigger();
@@ -315,57 +299,72 @@ public abstract class Controller : MonoBehaviour
         // timer
         statesTimer.Duration = GameConstants.Landing.Length;
         statesTimer.Run();
+        // triggered
+        StateOnEnter(State.Case.Landing);
     }
-
-    #endregion
-
-    #region Run States
 
     protected abstract bool FlippingLeftTrigger();
     protected virtual void FlippingLeftOnEnter()
     {
         // action
-        Flip(true);
+        float localScaleX = (gameObject.transform.localScale.x > 0) ?
+            gameObject.transform.localScale.x :
+            -gameObject.transform.localScale.x;
+        gameObject.transform.localScale = new Vector3(
+            localScaleX, 
+            gameObject.transform.localScale.y,
+            gameObject.transform.localScale.z);
         // animator
         animator.Play(GameConstants.Running.AnimatorName);
+        // triggered
+        StateOnEnter(State.Case.FlippingLeft);
     }
 
     protected abstract bool FlippingRightTrigger();
     protected virtual void FlippingRightOnEnter()
     {
         // action
-        Flip(false);
+        float localScaleX = (gameObject.transform.localScale.x < 0) ?
+            gameObject.transform.localScale.x :
+            -gameObject.transform.localScale.x;
+        gameObject.transform.localScale = new Vector3(
+            localScaleX,
+            gameObject.transform.localScale.y,
+            gameObject.transform.localScale.z);
         // animator
         animator.Play(GameConstants.Running.AnimatorName);
+        // triggered
+        StateOnEnter(State.Case.FlippingRight);
     }
 
     protected abstract bool RunningTrigger();
     protected virtual void RunningOnEnter()
     {
         // action
-        Run();
+        if (Mathf.Abs(rb2d.velocity.x) < MaxVelocity)
+        {
+            rb2d.AddForce(
+                new Vector2(-gameObject.transform.localScale.x * runForceMagnitude, 0),
+                ForceMode2D.Impulse);
+        }
         // timer
         statesTimer.Duration = GameConstants.Running.Length / 2f;
         statesTimer.Run();
+        // triggered
+        StateOnEnter(State.Case.Running);
     }
-
-    #endregion
-
-    #region Attack States
 
     protected abstract bool AttackingTrigger();
     protected virtual void AttackingOnEnter()
     {
-        // animator
-        animator.Play(GameConstants.Attacking.AnimatorName);
         // timer
         statesTimer.Duration = GameConstants.Attacking.Length;
         statesTimer.Run();
+        // triggered
+        StateOnEnter(State.Case.Attacking);
+        // animator
+        animator.Play(GameConstants.Attacking.AnimatorName);
     }
-
-    #endregion
-
-    #region Throw States
 
     protected abstract bool ThrowingTrigger();
     protected virtual void ThrowingOnEnter()
@@ -375,6 +374,8 @@ public abstract class Controller : MonoBehaviour
         // timer
         statesTimer.Duration = GameConstants.Throwing.Length;
         statesTimer.Run();
+        // triggered
+        StateOnEnter(State.Case.Throwing);
     }
 
     #endregion
