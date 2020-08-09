@@ -50,12 +50,6 @@ public class Player : Fighter, IPlayerStartedStateInvoker
         SetHead(characterName);
     }
 
-    protected override void Update()
-    {
-        // base call
-        base.Update();
-    }
-
     #endregion
 
     #region Controller Overrides

@@ -98,7 +98,6 @@ public abstract class Fighter : Controller, IDamageTakenInvoker
     protected void SetHead(CharacterName characterName)
     {
         Sprite characterHead = heads[characterName];
-        Debug.Log(characterHead);
         if (characterHead != null)
         {
             head.GetComponent<SpriteRenderer>().sprite = characterHead;

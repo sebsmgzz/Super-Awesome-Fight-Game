@@ -79,16 +79,16 @@ public abstract class Controller : MonoBehaviour
 
     protected virtual void Update()
     {
-        IList<GraphNode<State>> neighbors = currentNode.Neighbors;
-        foreach(GraphNode<State> neighbor in neighbors)
-        {
-            if(neighbor.Value.Triggered)
-            {
-                currentNode = neighbor;
-                neighbor.Value.Invoke();
-                break;
-            }
-        }
+        //IList<GraphNode<State>> neighbors = currentNode.Neighbors;
+        //foreach(GraphNode<State> neighbor in neighbors)
+        //{
+        //    if(neighbor.Value.Triggered)
+        //    {
+        //        currentNode = neighbor;
+        //        neighbor.Value.Invoke();
+        //        break;
+        //    }
+        //}
     }
 
     protected virtual void OnCollisionEnter2D(Collision2D collision)
