@@ -1,15 +1,13 @@
-﻿using System.Collections.Generic;
-using System.Net.NetworkInformation;
+﻿using System;
 using UnityEngine;
 using UnityEngine.Events;
 
-public class Player : Fighter, IPlayerStartedStateInvoker
+public class Player : Fighter
 {
 
     #region Fields
 
-    // events
-    private PlayerStartedState playerStartedStateEvent = new PlayerStartedState();
+    private PlayerController controls;
 
     #endregion
 
@@ -17,62 +15,21 @@ public class Player : Fighter, IPlayerStartedStateInvoker
 
     public override Name FighterName => Name.Player;
 
-    protected override float MaxVelocity => 5f;
-
-    #endregion
-
-    #region IPlayerStartedStateInvoker
-
-    public void AddPlayerStartedStateListener(UnityAction<State.Case> listener)
-    {
-        playerStartedStateEvent.AddListener(listener);
-    }
+    public override bool CanTakeDamage => controls.CurrentState != Controller.StateName.Covering;
 
     #endregion
 
     #region Unity API
 
-    protected override void Awake()
-    {
-        // base call
-        base.Awake();
-        // events
-        EventsManager.AddInvoker((IPlayerStartedStateInvoker)this);
-    }
-
     protected override void Start()
     {
-        // base call
         base.Start();
-        Initialize();
-        // haad
+        // initialize head
         CharacterName characterName = (CharacterName)PlayerPrefs.GetInt(GameConstants.CharacterPrefKey);
         SetHead(characterName);
+        // controls
+        controls = gameObject.AddComponent<PlayerController>();
     }
-
-    #endregion
-
-    #region Controller Overrides
-
-    protected override void StateOnEnter(State.Case stateName)
-    {
-        // events
-        playerStartedStateEvent.Invoke(stateName);
-    }
-
-    protected override bool IdlingTrigger() => statesTimer.Finished;
-    protected override bool CrouchingTrigger() => Input.GetKey(KeyCode.S);
-    protected override bool StandInputCheck() => !Input.GetKey(KeyCode.S);
-    protected override bool CoveringTrigger() => Input.GetKey(KeyCode.E);
-    protected override bool UncoveringTrigger() => !Input.GetKey(KeyCode.E);
-    protected override bool LaunchingTrigger() => Input.GetKeyDown(KeyCode.W);
-    protected override bool FallingTrigger() => statesTimer.Finished;
-    protected override bool LandingTrigger() => landed;
-    protected override bool FlippingLeftTrigger() => Input.GetKeyDown(KeyCode.A);
-    protected override bool FlippingRightTrigger() => Input.GetKeyDown(KeyCode.D);
-    protected override bool RunningTrigger() => Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D);
-    protected override bool AttackingTrigger() => Input.GetKeyDown(KeyCode.Q);
-    protected override bool ThrowingTrigger() => Input.GetKeyDown(KeyCode.Space);
 
     #endregion
 

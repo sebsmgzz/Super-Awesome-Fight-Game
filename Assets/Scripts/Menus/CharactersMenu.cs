@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.Collections;
+using UnityEngine;
 using UnityEngine.UI;
 
 public class CharactersMenu : MonoBehaviour
@@ -43,9 +44,8 @@ public class CharactersMenu : MonoBehaviour
                 return CharacterName.Maritza;
             case "Majo":
                 return CharacterName.Majo;
-            default:
-                return CharacterName.Undefined;
         }
+        return CharacterName.Sebas;
     }
 
     #endregion

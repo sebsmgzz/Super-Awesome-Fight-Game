@@ -7,6 +7,6 @@ public interface IPlayerStartedStateInvoker
     /// Adds a listener to the start of a state
     /// </summary>
     /// <param name="listener">The listener the the start of a state</param>
-    void AddPlayerStartedStateListener(UnityAction<State.Case> listener);
+    void AddPlayerStartedStateListener(UnityAction<Controller.StateName> listener);
 
 }

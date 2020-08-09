@@ -2,13 +2,13 @@
 using UnityEngine;
 using UnityEngine.Events;
 
-public abstract class Fighter : Controller, IDamageTakenInvoker 
+public abstract class Fighter : MonoBehaviour, IDamageTakenInvoker 
 {
 
     #region Fields
 
     // events
-    protected DamageTaken damageTakenEvent = new DamageTaken();
+    private DamageTaken damageTakenEvent = new DamageTaken();
 
     // colliders
     protected GameObject body;
@@ -19,15 +19,17 @@ public abstract class Fighter : Controller, IDamageTakenInvoker
     protected GameObject rightLeg;
 
     // heads
-    private Dictionary<CharacterName, Sprite> heads =
-        new Dictionary<CharacterName, Sprite>();
-    [SerializeField] private Sprite sebasHead;
-    [SerializeField] private Sprite camachoHead;
-    [SerializeField] private Sprite chavarriaHead;
-    [SerializeField] private Sprite ramonHead;
-    [SerializeField] private Sprite joaquinHead;
-    [SerializeField] private Sprite maritzaHead;
-    [SerializeField] private Sprite majoHead;
+    private Dictionary<CharacterName, string> heads =
+        new Dictionary<CharacterName, string>()
+        {
+            { CharacterName.Sebas, "Heads/Sebastian" },
+            { CharacterName.Camacho, "Heads/Camacho" },
+            { CharacterName.Chavarria, "Heads/Chavarria" },
+            { CharacterName.Ramon, "Heads/Ramon" },
+            { CharacterName.Joaquin, "Heads/Joaquin" },
+            { CharacterName.Maritza, "Heads/Maritza" },
+            { CharacterName.Majo, "Heads/Majo" }
+        };
 
     #endregion
 
@@ -38,14 +40,10 @@ public abstract class Fighter : Controller, IDamageTakenInvoker
     /// </summary>
     public abstract Name FighterName { get; }
 
-    #endregion
-
-    #region IDamageTakenInvoker
-
-    public void AddDamageTakenListener(UnityAction<Name> listener)
-    {
-        damageTakenEvent.AddListener(listener);
-    }
+    /// <summary>
+    /// Determinse if the fighter can take damage
+    /// </summary>
+    public abstract bool CanTakeDamage { get; }
 
     #endregion
 
@@ -58,12 +56,20 @@ public abstract class Fighter : Controller, IDamageTakenInvoker
         EventsManager.AddHealthEmptiedListener(HandleHealthEmptiedEvent);
     }
 
-    protected override void OnCollisionEnter2D(Collision2D collision)
+    protected virtual void Start()
     {
-        // call base
-        base.OnCollisionEnter2D(collision);
-        // call events
-        if (collision.collider.gameObject.CompareTag(GameConstants.SwordTag) && !Covering)
+        // body parts
+        body = gameObject.transform.Find("Body").gameObject;
+        head = gameObject.transform.Find("Body/Head").gameObject;
+        shield = gameObject.transform.Find("Body/Shield").gameObject;
+        sword = gameObject.transform.Find("Body/Sword").gameObject;
+        leftLeg = gameObject.transform.Find("LeftLeg").gameObject;
+        rightLeg = gameObject.transform.Find("RightLeg").gameObject;
+    }
+
+    protected virtual void OnCollisionEnter2D(Collision2D collision)
+    {
+        if (collision.collider.gameObject.CompareTag(GameConstants.SwordTag) && CanTakeDamage)
         {
             damageTakenEvent.Invoke(FighterName);
         }
@@ -74,31 +80,13 @@ public abstract class Fighter : Controller, IDamageTakenInvoker
     #region Methods
 
     /// <summary>
-    /// Initializes fields of fighter
+    /// Sets the head sprite of the fighter
     /// </summary>
-    protected void Initialize()
-    {
-        // body parts
-        body = gameObject.transform.Find("Body").gameObject;
-        head = gameObject.transform.Find("Body/Head").gameObject;
-        shield = gameObject.transform.Find("Body/Shield").gameObject;
-        sword = gameObject.transform.Find("Body/Sword").gameObject;
-        leftLeg = gameObject.transform.Find("LeftLeg").gameObject;
-        rightLeg = gameObject.transform.Find("RightLeg").gameObject;
-        // heads
-        heads.Add(CharacterName.Sebas, sebasHead);
-        heads.Add(CharacterName.Camacho, camachoHead);
-        heads.Add(CharacterName.Chavarria, chavarriaHead);
-        heads.Add(CharacterName.Ramon, ramonHead);
-        heads.Add(CharacterName.Joaquin, joaquinHead);
-        heads.Add(CharacterName.Maritza, maritzaHead);
-        heads.Add(CharacterName.Majo, majoHead);
-    }
-
+    /// <param name="characterName">The character name of the head</param>
     protected void SetHead(CharacterName characterName)
     {
-        Sprite characterHead = heads[characterName];
-        if (characterHead != null)
+        Sprite characterHead = Resources.Load<Sprite>(heads[characterName]);
+        if (characterHead != null && head != null)
         {
             head.GetComponent<SpriteRenderer>().sprite = characterHead;
         }
@@ -106,12 +94,17 @@ public abstract class Fighter : Controller, IDamageTakenInvoker
 
     #endregion
 
+    #region IDamageTakenInvoker
+
+    public void AddDamageTakenListener(UnityAction<Name> listener)
+    {
+        damageTakenEvent.AddListener(listener);
+    }
+
+    #endregion
+
     #region Event Handlers
 
-    /// <summary>
-    /// Invoked when a healthbar is emptied
-    /// </summary>
-    /// <param name="fighterEmptied">The fighter whose health bar was emptied</param>
     public void HandleHealthEmptiedEvent(Name fighterEmptied)
     {
         if (fighterEmptied == FighterName)

@@ -1,5 +1,5 @@
 ﻿using UnityEngine.Events;
 
-public class PlayerStartedState : UnityEvent<State.Case>
+public class PlayerStartedState : UnityEvent<Controller.StateName>
 {
 }

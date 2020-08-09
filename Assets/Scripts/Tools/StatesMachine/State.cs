@@ -1,24 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
 
-public class State2
+public class State<T>
 {
 
     #region Fields
 
-    private Func<bool> triggerer = new Func<bool>(() => false);
-    private Action action = null;
-    private Action onEnter = null;
-    private Action onExit = null;
+    private T value;
 
-    private bool active = false;
-    private bool selfDeactivates = false;
+    private Func<bool> triggerer;
+    private Action action;
+    private Action onEnter;
+    private Action onExit;
 
-    private List<State2> neighbors = new List<State2>();
+    private bool active;
+    private bool selfDeactivates;
+
+    private List<State<T>> neighbors;
 
     #endregion
 
     #region Property
+
+    /// <summary>
+    /// The content of the state
+    /// </summary>
+    public T Value
+    {
+        get { return value; }
+        set { this.value = value; }
+    }
 
     /// <summary>
     /// Determines if the state should start/continue to execute
@@ -85,6 +96,23 @@ public class State2
 
     #region Constructor
 
+    public State(T value)
+    {
+        this.value = value;
+        this.triggerer = new Func<bool>(() => false);
+        this.action = null;
+        this.onEnter = null;
+        this.onExit = null;
+        this.active = false;
+        this.selfDeactivates = false;
+        this.neighbors = new List<State<T>>();
+    }
+
+    public IList<State<T>> Neighbors
+    {
+        get { return neighbors.AsReadOnly(); }
+    }
+
     #endregion
 
     #region Methods
@@ -131,9 +159,9 @@ public class State2
     /// Gets the next state triggered in the list of neighbors
     /// </summary>
     /// <returns>The next state triggered</returns>
-    public State2 NextState()
+    public State<T> NextState()
     {
-        foreach (State2 neighbor in neighbors)
+        foreach (State<T> neighbor in neighbors)
         {
             if (neighbor.CheckTriggerer())
             {
@@ -155,12 +183,16 @@ public class State2
         }
     }
 
+    #endregion
+
+    #region Collection Methods
+
     /// <summary>
     /// Adds the given state as a neighbor for this state
     /// </summary>
     /// <param name="neighbor">Neighbor to add</param>
     /// <returns>True if the neighbor was added, false otherwise</returns>
-    public bool AddNeighbor(State2 neighbor)
+    public bool AddNeighbor(State<T> neighbor)
     {
         if (neighbors.Contains(neighbor))
         {
@@ -178,7 +210,7 @@ public class State2
     /// </summary>
     /// <param name="neighbor">State to remove</param>
     /// <returns>True if the state was removed, false otherwise</returns>
-    public bool RemoveNeighbor(State2 neighbor)
+    public bool RemoveNeighbor(State<T> neighbor)
     {
         return neighbors.Remove(neighbor);
     }
@@ -187,7 +219,7 @@ public class State2
     /// Removes all the neighbor states from this state
     /// </summary>
     /// <returns>True if the neighbors were removed, false otherwise</returns>
-    public bool RemoveAllNeighbor()
+    public bool RemoveAllNeighbors()
     {
         for (int i = neighbors.Count - 1; i >= 0; i--)
         {

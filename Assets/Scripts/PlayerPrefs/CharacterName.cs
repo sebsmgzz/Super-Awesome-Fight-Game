@@ -7,6 +7,5 @@ public enum CharacterName
     Ramon,
     Joaquin,
     Maritza,
-    Majo,
-    Undefined
+    Majo
 }

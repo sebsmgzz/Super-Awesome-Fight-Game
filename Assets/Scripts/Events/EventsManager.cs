@@ -21,8 +21,8 @@ public static class EventsManager
 
     private static List<IPlayerStartedStateInvoker> playerStartedStateInvokers =
         new List<IPlayerStartedStateInvoker>();
-    private static List<UnityAction<State.Case>> playerStartedStateListeners =
-        new List<UnityAction<State.Case>>();
+    private static List<UnityAction<Controller.StateName>> playerStartedStateListeners =
+        new List<UnityAction<Controller.StateName>>();
 
     #endregion
 
@@ -49,7 +49,7 @@ public static class EventsManager
     public static void AddInvoker(IPlayerStartedStateInvoker invoker)
     {
         playerStartedStateInvokers.Add(invoker);
-        foreach (UnityAction<State.Case> listener in playerStartedStateListeners)
+        foreach (UnityAction<Controller.StateName> listener in playerStartedStateListeners)
         {
             invoker.AddPlayerStartedStateListener(listener);
         }
@@ -77,7 +77,7 @@ public static class EventsManager
         }
     }
 
-    public static void AddPlayerStartedStateListener(UnityAction<State.Case> listener)
+    public static void AddPlayerStartedStateListener(UnityAction<Controller.StateName> listener)
     {
         playerStartedStateListeners.Add(listener);
         foreach (IPlayerStartedStateInvoker invoker in playerStartedStateInvokers)
@@ -87,7 +87,5 @@ public static class EventsManager
     }
 
     #endregion
-
-
 
 }
