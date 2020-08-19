@@ -1,5 +1,5 @@
 ﻿using UnityEngine.Events;
 
-public class DamageTaken : UnityEvent<Fighter.Name>
+public class DamageMade : UnityEvent<float, FighterType>
 {
 }

@@ -9,7 +9,9 @@ public sealed class EnemyController : Controller
     #region Fields
 
     private GameObject playerGameObject;
-    private float nearDistanceTriggerer = 2.2f;
+    private Player player;
+    private float nearDistanceTriggerer;
+    private Dictionary<FighterState, bool> flags;
 
     #endregion
 
@@ -17,28 +19,45 @@ public sealed class EnemyController : Controller
 
     private void Awake()
     {
-        EventsManager.AddPlayerStartedStateListener(HandlePlayerStartedStateEvent);
+        AddControllerChangedStateListener(HandleControllerChangedState);
     }
 
-    private void Start()
+    protected override void Start()
     {
-        playerGameObject = GameObject.FindGameObjectWithTag(GameConstants.PlayerTag);
+        // base call to construct default states machine
+        base.Start();
+        // config
+        nearDistanceTriggerer = ConfigurationManager.NearDistanceTriggerer;
+        // find player
+        playerGameObject = GameObject.FindGameObjectWithTag(Game.Constants.GameObjectsTags[Tag.Player]);
+        player = playerGameObject.GetComponent<Player>();
+        // setup flags
+        flags = new Dictionary<FighterState, bool>();
+        foreach(FighterState state in Enum.GetValues(typeof(FighterState)))
+        {
+            flags.Add(state, false);
+        }
+        // add enemy implementation
+        states[FighterState.Idling].Action = IdlingAction;
+        states[FighterState.Running].SelfDeactivates = false;
+        states[FighterState.Running].Action = RunningAction;
     }
 
     #endregion
 
     #region States Triggerers
 
-    protected override bool CrouchingTriggerer() => Input.GetKey(KeyCode.S);
-    protected override bool StandingTriggerer() => !Input.GetKey(KeyCode.S);
-    protected override bool CoveringTriggerer() => Input.GetKey(KeyCode.E);
-    protected override bool UncoveringTriggerer() => !Input.GetKey(KeyCode.E);
-    protected override bool LaunchingTriggerer() => Input.GetKeyDown(KeyCode.W);
-    protected override bool FlippingLeftTriggerer() => Input.GetKeyDown(KeyCode.A);
-    protected override bool FlippingRightTrigger() => Input.GetKeyDown(KeyCode.D);
-    protected override bool RunningTriggerer() => Input.GetKey(KeyCode.A) || Input.GetKey(KeyCode.D);
-    protected override bool AttackingTriggerer() => Input.GetKeyDown(KeyCode.Q);
-    protected override bool ThrowingTriggerer() => Input.GetKeyDown(KeyCode.Space);
+    protected override bool IdlingTriggerer() => flags[FighterState.Idling];
+    protected override bool CrouchingTriggerer() => flags[FighterState.Crouching];
+    protected override bool StandingTriggerer() => flags[FighterState.Standing];
+    protected override bool CoveringTriggerer() => flags[FighterState.Covering];
+    protected override bool UncoveringTriggerer() => flags[FighterState.Uncovering];
+    protected override bool LaunchingTriggerer() => flags[FighterState.Launching];
+    protected override bool FlippingLeftTriggerer() => flags[FighterState.FlippingLeft];
+    protected override bool FlippingRightTrigger() => flags[FighterState.FlippingRight];
+    protected override bool RunningTriggerer() => flags[FighterState.Running];
+    protected override bool AttackingTriggerer() => flags[FighterState.Attacking];
+    protected override bool ThrowingTriggerer() => flags[FighterState.Throwing];
 
     #endregion
 
@@ -47,53 +66,66 @@ public sealed class EnemyController : Controller
     private void IdlingAction()
     {
         // check run controls
-        //if (!PlayerIsNear())
-        //{
-        //    bool playerIsToRightOfEnemy =
-        //        gameObject.transform.position.x < playerGameObject.transform.position.x;
-        //    statesFlags[State.Case.FlippingLeft] = !playerIsToRightOfEnemy;
-        //    statesFlags[State.Case.FlippingRight] = playerIsToRightOfEnemy;
-        //    statesFlags[State.Case.Running] = true;
-        //}
-        //else
-        //{
-        //    statesFlags[State.Case.Attacking] = true;
-        //}
+        if (PlayerIsNear())
+        {
+            flags[FighterState.Attacking] = true;
+        }
+        else if (PlayerIsRunningAway())
+        {
+            flags[FighterState.Throwing] = true;
+        }
+        else
+        {
+            bool playerIsToRightOfEnemy =
+                gameObject.transform.position.x < playerGameObject.transform.position.x;
+            flags[FighterState.FlippingLeft] = !playerIsToRightOfEnemy;
+            flags[FighterState.FlippingRight] = playerIsToRightOfEnemy;
+            flags[FighterState.Running] = true;
+        }
     }
 
-    private void RunningAction()
+    protected override void RunningAction()
     {
-        //statesFlags[State.Case.Running] = true;
-        //if (PlayerIsNear())
-        //{
-        //    statesFlags[State.Case.Running] = false;
-        //    statesFlags[State.Case.Idling] = true;
-        //}
-        //else
-        //{
-        //    bool facingRight = gameObject.transform.localScale.x == -1;
-        //    bool playerLocatedRight =
-        //        gameObject.transform.position.x < playerGameObject.transform.position.x;
-        //    statesFlags[State.Case.FlippingLeft] = facingRight && !playerLocatedRight;
-        //    statesFlags[State.Case.FlippingRight] = !facingRight && playerLocatedRight;
-        //}
-    }
-
-    private void AttackingAction()
-    {
-        //statesFlags[State.Case.Idling] = statesTimer.Finished;
+        base.RunningAction();
+        if (PlayerIsNear())
+        {
+            flags[FighterState.Attacking] = true;
+        }
+        else
+        {
+            bool facingRight = gameObject.transform.localScale.x == -1;
+            bool playerLocatedRight =
+                gameObject.transform.position.x < playerGameObject.transform.position.x;
+            bool facingPlayer = (facingRight && playerLocatedRight) ||
+                                (!facingRight && !playerLocatedRight);
+            if(!facingPlayer)
+            {
+                flags[FighterState.FlippingLeft] = facingRight && !playerLocatedRight;
+                flags[FighterState.FlippingRight] = !facingRight && playerLocatedRight;
+                flags[FighterState.Running] = true;
+            }
+        }
     }
 
     #endregion
 
     #region Event Handlers
 
-    private void HandlePlayerStartedStateEvent(Controller.StateName stateName)
+    private void HandleControllerChangedState(FighterState previousState, FighterState nextState)
     {
+        flags[previousState] = false;
+        flags[nextState] = false;
     }
 
-    protected override void HandleStateChangedEvent(StateName stateName)
+    protected override void HandleTimerFinishedEvent()
     {
+        switch(statesMachine.CurrentState.Value)
+        {
+            case FighterState.Attacking:
+            case FighterState.Throwing:
+                flags[FighterState.Idling] = true;
+                break;
+        }
     }
 
     #endregion
@@ -112,6 +144,28 @@ public sealed class EnemyController : Controller
             Mathf.Pow(playerPosition.x - enemyPosition.x, 2) +
             Mathf.Pow(playerPosition.y - enemyPosition.y, 2));
         return distance < nearDistanceTriggerer;
+    }
+
+    /// <summary>
+    /// Determines if the player is within a chicken
+    /// </summary>
+    /// <returns>True when player is chicken, false otherwise</returns>
+    private bool PlayerIsRunningAway()
+    {
+        if(player.CurrentState == FighterState.Running)
+        {
+            bool playerFacingRight = playerGameObject.transform.localScale.x < 0;
+            float playerPosition = playerGameObject.transform.localPosition.x;
+            float enemyPosition = gameObject.transform.localPosition.x;
+            bool playerIsToRight = playerPosition > enemyPosition;
+            if( (playerFacingRight && playerIsToRight) ||
+                (!playerFacingRight && !playerIsToRight) )
+            {
+                return true;
+            }
+
+        }
+        return false;
     }
 
     #endregion

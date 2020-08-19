@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using UnityEngine;
 
 /// <summary>
 /// Manages states as a machine
@@ -13,7 +12,7 @@ public class StatesMachine<T>
     private State<T> defaultState;
     private State<T> currentState;
     private List<State<T>> states;
-    private List<Action<T>> stateChangedListeners;
+    private List<Action<T, T>> stateChangedListeners;
 
     #endregion
 
@@ -44,7 +43,7 @@ public class StatesMachine<T>
         this.currentState = this.defaultState;
         this.currentState.Enter();
         this.states = new List<State<T>> { defaultState };
-        this.stateChangedListeners = new List<Action<T>>();
+        this.stateChangedListeners = new List<Action<T, T>>();
     }
 
     #endregion
@@ -182,7 +181,7 @@ public class StatesMachine<T>
     /// Adds a listener to call when a change in state is made
     /// </summary>
     /// <param name="listener">The listener</param>
-    public void AddStateChangedListener(Action<T> listener)
+    public void AddStateChangedListener(Action<T, T> listener)
     {
         stateChangedListeners.Add(listener);
     }
@@ -196,12 +195,10 @@ public class StatesMachine<T>
         State<T> nextState = currentState.NextState();
         if (nextState != null)
         {
-            Debug.Log("Boop");
             GoTo(nextState.Value);
         }
         else if (!currentState.Active)
         {
-            Debug.Log("Beep");
             GoTo(defaultState.Value);
         }
     }
@@ -221,9 +218,9 @@ public class StatesMachine<T>
             {
                 currentState.Enter();
             }
-            foreach (Action<T> listener in stateChangedListeners)
+            foreach (Action<T, T> listener in stateChangedListeners)
             {
-                listener.Invoke(currentState.Value);
+                listener.Invoke(state.Value, currentState.Value);
             }
             return true;
         }

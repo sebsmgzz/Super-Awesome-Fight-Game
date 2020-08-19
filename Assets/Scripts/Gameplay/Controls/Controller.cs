@@ -2,11 +2,16 @@
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 
 public abstract class Controller : MonoBehaviour
 {
 
     #region Fields
+
+    // events
+    private ControllerChangedState controllerChangedStateEvent =
+        new ControllerChangedState();
 
     // components
     private Animator animator;
@@ -14,9 +19,9 @@ public abstract class Controller : MonoBehaviour
     protected Timer statesTimer;
 
     // state machine
-    private StatesMachine<StateName> statesMachine;
-    private Dictionary<StateName, State<StateName>> states =
-        new Dictionary<StateName, State<StateName>>();
+    protected StatesMachine<FighterState> statesMachine;
+    protected Dictionary<FighterState, State<FighterState>> states =
+        new Dictionary<FighterState, State<FighterState>>();
 
     // config
     private float runForceMagnitude;
@@ -48,7 +53,7 @@ public abstract class Controller : MonoBehaviour
         set { maxRunVelocity = value; }
     }
 
-    public StateName CurrentState
+    public FighterState CurrentState
     {
         get { return statesMachine.CurrentState.Value; }
     }
@@ -57,30 +62,31 @@ public abstract class Controller : MonoBehaviour
 
     #region Unity API
 
-    private void Start()
+    protected virtual void Start()
     {
         // components
         animator = gameObject.GetComponent<Animator>();
         rb2d = gameObject.GetComponent<Rigidbody2D>();
         statesTimer = gameObject.AddComponent<Timer>();
+        statesTimer.AddTimerFinishedListener(HandleTimerFinishedEvent);
         // config
         runForceMagnitude = ConfigurationManager.RunForceMagnitude;
         jumpForceMagnitude = ConfigurationManager.JumpForceMagnitude;
         maxRunVelocity = 2;
-        // states
-        BuildStatesMachine();
+        // initialize states machine
+        BuildStates();
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         statesMachine.Update();
     }
 
     private void OnCollisionEnter2D(Collision2D collision)
     {
-        if (collision.gameObject.CompareTag(GameConstants.PlataformTag)
-        || collision.gameObject.CompareTag(GameConstants.EnemyTag)
-        || collision.gameObject.CompareTag(GameConstants.PlayerTag))
+        if (collision.gameObject.CompareTag(Game.Constants.GameObjectsTags[Tag.Plataform])
+        || collision.gameObject.CompareTag(Game.Constants.GameObjectsTags[Tag.Enemy])
+        || collision.gameObject.CompareTag(Game.Constants.GameObjectsTags[Tag.Player]) )
         {
             landed = true;
         }
@@ -93,84 +99,86 @@ public abstract class Controller : MonoBehaviour
     /// <summary>
     /// Builds and configures the default states in the states machine
     /// </summary>
-    private void BuildStatesMachine()
+    private void BuildStates()
     {
         // add states
-        statesMachine = new StatesMachine<StateName>(StateName.Idling);
-        List<StateName> stateNames = Enum.GetValues(typeof(StateName)).OfType<StateName>().ToList<StateName>();
-        stateNames.Remove(StateName.Idling);
-        states.Add(StateName.Idling, statesMachine.Find(StateName.Idling));
-        foreach (StateName state in stateNames)
+        statesMachine = new StatesMachine<FighterState>(FighterState.Idling);
+        List<FighterState> stateNames = Enum.GetValues(typeof(FighterState)).OfType<FighterState>().ToList<FighterState>();
+        stateNames.Remove(FighterState.Idling);
+        states.Add(FighterState.Idling, statesMachine.Find(FighterState.Idling));
+        foreach (FighterState state in stateNames)
         {
             statesMachine.AddState(state);
             states.Add(state, statesMachine.Find(state));
         }
         // StateName.Idling
-        states[StateName.Idling].Triggerer = IdlingTriggerer;
-        states[StateName.Idling].OnEnter = IdlingOnEnter;
-        states[StateName.Idling].AddNeighbor(states[StateName.Crouching]);
-        states[StateName.Idling].AddNeighbor(states[StateName.Covering]);
-        states[StateName.Idling].AddNeighbor(states[StateName.Launching]);
-        states[StateName.Idling].AddNeighbor(states[StateName.Attacking]);
-        states[StateName.Idling].AddNeighbor(states[StateName.FlippingLeft]);
-        states[StateName.Idling].AddNeighbor(states[StateName.FlippingRight]);
-        states[StateName.Idling].AddNeighbor(states[StateName.Throwing]);
+        states[FighterState.Idling].Triggerer = IdlingTriggerer;
+        states[FighterState.Idling].OnEnter = IdlingOnEnter;
+        states[FighterState.Idling].AddNeighbor(states[FighterState.Crouching]);
+        states[FighterState.Idling].AddNeighbor(states[FighterState.Covering]);
+        states[FighterState.Idling].AddNeighbor(states[FighterState.Launching]);
+        states[FighterState.Idling].AddNeighbor(states[FighterState.Attacking]);
+        states[FighterState.Idling].AddNeighbor(states[FighterState.FlippingLeft]);
+        states[FighterState.Idling].AddNeighbor(states[FighterState.FlippingRight]);
+        states[FighterState.Idling].AddNeighbor(states[FighterState.Throwing]);
         // StateName.Crouching
-        states[StateName.Crouching].Triggerer = CrouchingTriggerer;
-        states[StateName.Crouching].OnEnter = CrouchingOnEnter;
-        states[StateName.Crouching].AddNeighbor(states[StateName.Standing]);
+        states[FighterState.Crouching].Triggerer = CrouchingTriggerer;
+        states[FighterState.Crouching].OnEnter = CrouchingOnEnter;
+        states[FighterState.Crouching].AddNeighbor(states[FighterState.Standing]);
         // StateName.Standing
-        states[StateName.Standing].Triggerer = StandingTriggerer;
-        states[StateName.Standing].OnEnter = StandingOnEnter;
-        states[StateName.Standing].AddNeighbor(states[StateName.Idling]);
+        states[FighterState.Standing].Triggerer = StandingTriggerer;
+        states[FighterState.Standing].OnEnter = StandingOnEnter;
+        states[FighterState.Standing].AddNeighbor(states[FighterState.Idling]);
         // StateName.Covering
-        states[StateName.Covering].Triggerer = CoveringTriggerer;
-        states[StateName.Covering].OnEnter = CoveringOnEnter;
-        states[StateName.Covering].AddNeighbor(states[StateName.Uncovering]);
+        states[FighterState.Covering].Triggerer = CoveringTriggerer;
+        states[FighterState.Covering].OnEnter = CoveringOnEnter;
+        states[FighterState.Covering].AddNeighbor(states[FighterState.Uncovering]);
         // StateName.Uncovering
-        states[StateName.Uncovering].Triggerer = UncoveringTriggerer;
-        states[StateName.Uncovering].OnEnter = UncoveringOnEnter;
-        states[StateName.Uncovering].AddNeighbor(states[StateName.Idling]);
+        states[FighterState.Uncovering].Triggerer = UncoveringTriggerer;
+        states[FighterState.Uncovering].OnEnter = UncoveringOnEnter;
+        states[FighterState.Uncovering].AddNeighbor(states[FighterState.Idling]);
         // StateName.Launching
-        states[StateName.Launching].Triggerer = LaunchingTriggerer;
-        states[StateName.Launching].OnEnter = LaunchingOnEnter;
-        states[StateName.Launching].AddNeighbor(states[StateName.Falling]);
+        states[FighterState.Launching].Triggerer = LaunchingTriggerer;
+        states[FighterState.Launching].OnEnter = LaunchingOnEnter;
+        states[FighterState.Launching].AddNeighbor(states[FighterState.Falling]);
         // StateName.Falling
-        states[StateName.Falling].Triggerer = FallingTriggerer;
-        states[StateName.Falling].OnEnter = FallingOnEnter;
-        states[StateName.Falling].AddNeighbor(states[StateName.Landing]);
+        states[FighterState.Falling].Triggerer = FallingTriggerer;
+        states[FighterState.Falling].OnEnter = FallingOnEnter;
+        states[FighterState.Falling].AddNeighbor(states[FighterState.Landing]);
         // StateName.Landing
-        states[StateName.Landing].Triggerer = LandingTriggerer;
-        states[StateName.Landing].OnEnter = LandingOnEnter;
-        states[StateName.Landing].AddNeighbor(states[StateName.Idling]);
-        states[StateName.Landing].AddNeighbor(states[StateName.FlippingLeft]);
-        states[StateName.Landing].AddNeighbor(states[StateName.FlippingRight]);
+        states[FighterState.Landing].Triggerer = LandingTriggerer;
+        states[FighterState.Landing].OnEnter = LandingOnEnter;
+        states[FighterState.Landing].AddNeighbor(states[FighterState.Idling]);
+        states[FighterState.Landing].AddNeighbor(states[FighterState.FlippingLeft]);
+        states[FighterState.Landing].AddNeighbor(states[FighterState.FlippingRight]);
         // StateName.Attacking
-        states[StateName.Attacking].Triggerer = AttackingTriggerer;
-        states[StateName.Attacking].OnEnter = AttackingOnEnter;
-        states[StateName.Attacking].AddNeighbor(states[StateName.Idling]);
+        states[FighterState.Attacking].Triggerer = AttackingTriggerer;
+        states[FighterState.Attacking].OnEnter = AttackingOnEnter;
+        states[FighterState.Attacking].AddNeighbor(states[FighterState.Idling]);
         // StateName.FlippingLeft
-        states[StateName.FlippingLeft].Triggerer = FlippingLeftTriggerer;
-        states[StateName.FlippingLeft].OnEnter = FlippingLeftOnEnter;
-        states[StateName.FlippingLeft].AddNeighbor(states[StateName.Running]);
+        states[FighterState.FlippingLeft].Triggerer = FlippingLeftTriggerer;
+        states[FighterState.FlippingLeft].OnEnter = FlippingLeftOnEnter;
+        states[FighterState.FlippingLeft].AddNeighbor(states[FighterState.Running]);
         // StateName.FlippingRight
-        states[StateName.FlippingRight].Triggerer = FlippingRightTrigger;
-        states[StateName.FlippingRight].OnEnter = FlippingRightOnEnter;
-        states[StateName.FlippingRight].AddNeighbor(states[StateName.Running]);
+        states[FighterState.FlippingRight].Triggerer = FlippingRightTrigger;
+        states[FighterState.FlippingRight].OnEnter = FlippingRightOnEnter;
+        states[FighterState.FlippingRight].AddNeighbor(states[FighterState.Running]);
         // StateName.Running
-        states[StateName.Running].Triggerer = RunningTriggerer;
-        states[StateName.Running].OnEnter = RunningOnEnter;
-        states[StateName.Running].Action = RunningAction;
-        states[StateName.Running].SelfDeactivates = true;
-        states[StateName.Running].AddNeighbor(states[StateName.FlippingLeft]);
-        states[StateName.Running].AddNeighbor(states[StateName.FlippingRight]);
-        states[StateName.Running].AddNeighbor(states[StateName.Running]);
-        states[StateName.Running].AddNeighbor(states[StateName.Idling]);
-        states[StateName.Running].AddNeighbor(states[StateName.Launching]);
+        states[FighterState.Running].Triggerer = RunningTriggerer;
+        states[FighterState.Running].OnEnter = RunningOnEnter;
+        states[FighterState.Running].Action = RunningAction;
+        states[FighterState.Running].SelfDeactivates = true;
+        states[FighterState.Running].AddNeighbor(states[FighterState.FlippingLeft]);
+        states[FighterState.Running].AddNeighbor(states[FighterState.FlippingRight]);
+        states[FighterState.Running].AddNeighbor(states[FighterState.Running]);
+        states[FighterState.Running].AddNeighbor(states[FighterState.Idling]);
+        states[FighterState.Running].AddNeighbor(states[FighterState.Launching]);
+        states[FighterState.Running].AddNeighbor(states[FighterState.Attacking]);
+        states[FighterState.Running].AddNeighbor(states[FighterState.Throwing]);
         // StateName.Throwing
-        states[StateName.Throwing].Triggerer = ThrowingTriggerer;
-        states[StateName.Throwing].OnEnter = ThrowingOnEnter;
-        states[StateName.Throwing].AddNeighbor(states[StateName.Idling]);
+        states[FighterState.Throwing].Triggerer = ThrowingTriggerer;
+        states[FighterState.Throwing].OnEnter = ThrowingOnEnter;
+        states[FighterState.Throwing].AddNeighbor(states[FighterState.Idling]);
         // Event
         statesMachine.AddStateChangedListener(HandleStateChangedEvent);
     }
@@ -179,105 +187,98 @@ public abstract class Controller : MonoBehaviour
 
     #region Events
 
-    protected abstract void HandleStateChangedEvent(StateName stateName);
-
-    #endregion
-
-    #region Enum
-
-    public enum StateName
+    public void AddControllerChangedStateListener(UnityAction<FighterState, FighterState> listener)
     {
-        Idling,
-        Crouching,
-        Defending,
-        Standing,
-        Covering,
-        Uncovering,
-        Launching,
-        Falling,
-        Landing,
-        Attacking,
-        FlippingLeft,
-        FlippingRight,
-        Running,
-        Throwing
+        controllerChangedStateEvent.AddListener(listener);
     }
+
+    private void HandleStateChangedEvent(FighterState previousState, FighterState nextState)
+    {
+        controllerChangedStateEvent.Invoke(previousState, nextState);
+    }
+
+    protected abstract void HandleTimerFinishedEvent();
 
     #endregion
 
     #region States Controls
 
-    protected bool IdlingTriggerer() => statesTimer.Finished;
-    private void IdlingOnEnter()
+    protected virtual bool IdlingTriggerer() => statesTimer.Finished;
+    protected virtual void IdlingOnEnter()
     {
-        animator.Play(GameConstants.Idling.animatorName);
+        animator.Play(Game.AnimationsInfo.Idling.animatorName);
     }
 
     protected abstract bool CrouchingTriggerer();
-    private void CrouchingOnEnter()
+    protected virtual void CrouchingOnEnter()
     {
-        animator.Play(GameConstants.Crouching.animatorName);
+        animator.Play(Game.AnimationsInfo.Crouching.animatorName);
         rb2d.constraints =
             RigidbodyConstraints2D.FreezeRotation |
             RigidbodyConstraints2D.FreezePositionX;
     }
 
     protected abstract bool StandingTriggerer();
-    private void StandingOnEnter()
+    protected virtual void StandingOnEnter()
     {
-        animator.Play(GameConstants.Standing.animatorName);
+        animator.Play(Game.AnimationsInfo.Standing.animatorName);
         rb2d.constraints = RigidbodyConstraints2D.FreezeRotation;
-        statesTimer.Duration = GameConstants.Standing.Length;
+        statesTimer.Stop();
+        statesTimer.Duration = Game.AnimationsInfo.Standing.Length;
         statesTimer.Run();
     }
 
     protected abstract bool CoveringTriggerer();
-    private void CoveringOnEnter()
+    protected virtual void CoveringOnEnter()
     {
-        animator.Play(GameConstants.Covering.AnimatorName);
+        animator.Play(Game.AnimationsInfo.Covering.AnimatorName);
     }
 
     protected abstract bool UncoveringTriggerer();
-    private void UncoveringOnEnter()
+    protected virtual void UncoveringOnEnter()
     {
-        animator.Play(GameConstants.Uncovering.AnimatorName);
-        statesTimer.Duration = GameConstants.Uncovering.Length;
+        animator.Play(Game.AnimationsInfo.Uncovering.AnimatorName);
+        statesTimer.Stop();
+        statesTimer.Duration = Game.AnimationsInfo.Uncovering.Length;
         statesTimer.Run();
     }
 
     protected abstract bool LaunchingTriggerer();
-    private void LaunchingOnEnter()
+    protected virtual void LaunchingOnEnter()
     {
-        animator.Play(GameConstants.Launching.animatorName);
+        animator.Play(Game.AnimationsInfo.Launching.animatorName);
+        float xForceMagnitude = (gameObject.transform.localScale.x > 0) ? -1 : 1;
         rb2d.AddForce(
-            new Vector2(0, jumpForceMagnitude),
+            new Vector2(xForceMagnitude, jumpForceMagnitude),
             ForceMode2D.Impulse);
-        statesTimer.Duration = GameConstants.Launching.Length;
+        statesTimer.Stop();
+        statesTimer.Duration = Game.AnimationsInfo.Launching.Length;
         statesTimer.Run();
     }
 
-    private bool FallingTriggerer() => statesTimer.Finished;
-    private void FallingOnEnter()
+    protected virtual bool FallingTriggerer() => statesTimer.Finished;
+    protected virtual void FallingOnEnter()
     {
-        animator.Play(GameConstants.Falling.AnimatorName);
+        animator.Play(Game.AnimationsInfo.Falling.AnimatorName);
         landed = false;
     }
 
-    private bool LandingTriggerer() => landed;
-    private bool LandingTriggererer()
+    protected virtual bool LandingTriggerer() => landed;
+    protected virtual bool LandingTriggererer()
     {
         return landed;
     }
-    private void LandingOnEnter()
+    protected virtual void LandingOnEnter()
     {
-        animator.Play(GameConstants.Landing.AnimatorName);
+        animator.Play(Game.AnimationsInfo.Landing.AnimatorName);
         landed = false;
-        statesTimer.Duration = GameConstants.Landing.Length;
+        statesTimer.Stop();
+        statesTimer.Duration = Game.AnimationsInfo.Landing.Length;
         statesTimer.Run();
     }
 
     protected abstract bool FlippingLeftTriggerer();
-    private void FlippingLeftOnEnter()
+    protected virtual void FlippingLeftOnEnter()
     {
         float localScaleX = gameObject.transform.localScale.x;
         if (localScaleX < 0)
@@ -291,7 +292,7 @@ public abstract class Controller : MonoBehaviour
     }
 
     protected abstract bool FlippingRightTrigger();
-    private void FlippingRightOnEnter()
+    protected virtual void FlippingRightOnEnter()
     {
         float localScaleX = gameObject.transform.localScale.x;
         if (localScaleX > 0)
@@ -305,11 +306,11 @@ public abstract class Controller : MonoBehaviour
     }
 
     protected abstract bool RunningTriggerer();
-    private void RunningOnEnter()
+    protected virtual void RunningOnEnter()
     {
-        animator.Play(GameConstants.Running.AnimatorName);
+        animator.Play(Game.AnimationsInfo.Running.AnimatorName);
     }
-    private void RunningAction()
+    protected virtual void RunningAction()
     {
         if (Mathf.Abs(rb2d.velocity.x) < maxRunVelocity)
         {
@@ -317,23 +318,23 @@ public abstract class Controller : MonoBehaviour
                 new Vector2(-gameObject.transform.localScale.x * runForceMagnitude, 0),
                 ForceMode2D.Impulse);
         }
-        statesTimer.Duration = GameConstants.Running.Length / 2f;
-        statesTimer.Run();
     }
 
     protected abstract bool AttackingTriggerer();
-    private void AttackingOnEnter()
+    protected virtual void AttackingOnEnter()
     {
-        animator.Play(GameConstants.Attacking.AnimatorName);
-        statesTimer.Duration = GameConstants.Attacking.Length;
+        animator.Play(Game.AnimationsInfo.Attacking.AnimatorName);
+        statesTimer.Stop();
+        statesTimer.Duration = Game.AnimationsInfo.Attacking.Length;
         statesTimer.Run();
     }
 
     protected abstract bool ThrowingTriggerer();
-    private void ThrowingOnEnter()
+    protected virtual void ThrowingOnEnter()
     {
-        animator.Play(GameConstants.Throwing.AnimatorName);
-        statesTimer.Duration = GameConstants.Throwing.Length;
+        animator.Play(Game.AnimationsInfo.Throwing.AnimatorName);
+        statesTimer.Stop();
+        statesTimer.Duration = Game.AnimationsInfo.Throwing.Length;
         statesTimer.Run();
     }
 

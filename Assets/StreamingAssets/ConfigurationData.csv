@@ -1,2 +1,4 @@
-runForceMagnitude, 0.2
+runForceMagnitude, 2
 jumpForceMagnitude, 7
+nearDistanceTriggerer, 2.2
+defaultDamageForce, 5

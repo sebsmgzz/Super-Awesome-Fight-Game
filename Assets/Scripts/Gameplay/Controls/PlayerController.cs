@@ -1,28 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using UnityEngine;
-using UnityEngine.Events;
+﻿using UnityEngine;
 
-public sealed class PlayerController : Controller, IPlayerStartedStateInvoker
+public sealed class PlayerController : Controller
 {
 
     #region Fields
-
-    private PlayerStartedState playerStateChangedEvent = new PlayerStartedState();
 
     #endregion
 
     #region UnityAPI
 
-    private void Awake()
-    {
-        EventsManager.AddInvoker((IPlayerStartedStateInvoker)this);
-    }
-
     #endregion
 
-    #region States Controls
+    #region States Triggerers
 
     protected override bool CrouchingTriggerer() => Input.GetKey(KeyCode.S);
     protected override bool StandingTriggerer() => !Input.GetKey(KeyCode.S);
@@ -37,20 +26,11 @@ public sealed class PlayerController : Controller, IPlayerStartedStateInvoker
 
     #endregion
 
-    #region Events
+    #region Events Handlers
 
-    protected override void HandleStateChangedEvent(StateName stateName)
+    protected override void HandleTimerFinishedEvent()
     {
-        playerStateChangedEvent.Invoke(stateName);
-    }
-
-    #endregion
-
-    #region IPlayerStartedStateInvoker
-
-    public void AddPlayerStartedStateListener(UnityAction<StateName> listener)
-    {
-        playerStateChangedEvent.AddListener(listener);
+        
     }
 
     #endregion

@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using UnityEngine;
 
@@ -11,8 +12,10 @@ public class ConfigurationData
     private const string ConfigurationDataFileName = "ConfigurationData.csv";
 
     // animations magnitudes
-    private static float runForceMagnitude = 0.1f;
+    private static float runForceMagnitude = 2f;
     private static float jumpForceMagnitude = 7f;
+    private static float nearDistanceTriggerer = 2.2f;
+    private static float defaultDamageForce = 5f;
 
     #endregion
 
@@ -20,6 +23,8 @@ public class ConfigurationData
 
     public float RunForceMagnitude => runForceMagnitude;
     public float JumpForceMagnitude => jumpForceMagnitude;
+    public float NearDistanceTriggerer => nearDistanceTriggerer;
+    public float DefaultDamageForce => defaultDamageForce;
 
     #endregion
 
@@ -68,8 +73,10 @@ public class ConfigurationData
     /// <param name="values">The dictionary containing the values</param>
     private static void SetConfigurationDataFields(Dictionary<string, string> values)
     {
-        runForceMagnitude = float.Parse(values["runForceMagnitude"]);
-        jumpForceMagnitude = float.Parse(values["jumpForceMagnitude"]);
+        runForceMagnitude = float.Parse(values["runForceMagnitude"], CultureInfo.InvariantCulture);
+        jumpForceMagnitude = float.Parse(values["jumpForceMagnitude"], CultureInfo.InvariantCulture);
+        nearDistanceTriggerer = float.Parse(values["nearDistanceTriggerer"], CultureInfo.InvariantCulture);
+        defaultDamageForce = float.Parse(values["defaultDamageForce"], CultureInfo.InvariantCulture);
     }
 
     #endregion

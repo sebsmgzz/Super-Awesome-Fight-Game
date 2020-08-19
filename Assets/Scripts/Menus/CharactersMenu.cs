@@ -19,7 +19,7 @@ public class CharactersMenu : MonoBehaviour
     private void Start()
     {
         displayText = displayGameObject.GetComponent<Text>();
-        displayText.text = displayPre + (CharacterName)PlayerPrefs.GetInt(GameConstants.CharacterPrefKey);
+        displayText.text = displayPre + (CharacterName)PlayerPrefs.GetInt(Game.Constants.PreferencesKeys[Preference.Character]);
     }
 
     #endregion
@@ -44,6 +44,8 @@ public class CharactersMenu : MonoBehaviour
                 return CharacterName.Maritza;
             case "Majo":
                 return CharacterName.Majo;
+            case "Lucia":
+                return CharacterName.Lucia;
         }
         return CharacterName.Sebas;
     }
@@ -54,7 +56,7 @@ public class CharactersMenu : MonoBehaviour
 
     public void HandleCharacterButtonOnClickEvent(GameObject gameObject)
     {
-        PlayerPrefs.SetInt(GameConstants.CharacterPrefKey, (int)GetCharacterName(gameObject.name));
+        PlayerPrefs.SetInt(Game.Constants.PreferencesKeys[Preference.Character], (int)GetCharacterName(gameObject.name));
         displayText.text = displayPre + gameObject.name;
     }
 

@@ -92,6 +92,14 @@ public class State<T>
         set { selfDeactivates = value; }
     }
 
+    /// <summary>
+    /// A list of all the neighbors
+    /// </summary>
+    public IList<State<T>> Neighbors
+    {
+        get { return neighbors.AsReadOnly(); }
+    }
+
     #endregion
 
     #region Constructor
@@ -106,11 +114,6 @@ public class State<T>
         this.active = false;
         this.selfDeactivates = false;
         this.neighbors = new List<State<T>>();
-    }
-
-    public IList<State<T>> Neighbors
-    {
-        get { return neighbors.AsReadOnly(); }
     }
 
     #endregion

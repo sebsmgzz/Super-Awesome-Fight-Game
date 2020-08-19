@@ -12,6 +12,8 @@ public static class ConfigurationManager
 
     public static float RunForceMagnitude => configData.RunForceMagnitude;
     public static float JumpForceMagnitude => configData.JumpForceMagnitude;
+    public static float NearDistanceTriggerer => configData.NearDistanceTriggerer;
+    public static float DefaultDamageForce => configData.DefaultDamageForce;
 
     #endregion
 

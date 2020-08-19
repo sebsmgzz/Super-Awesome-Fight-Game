@@ -1,5 +1,5 @@
 ﻿using UnityEngine.Events;
 
-public class HealthEmptied : UnityEvent<Fighter.Name>
+public class HealthEmptied : UnityEvent<FighterType>
 {
 }

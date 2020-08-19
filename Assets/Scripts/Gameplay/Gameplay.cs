@@ -3,6 +3,8 @@
 public class Gameplay : MonoBehaviour
 {
 
+    #region Unity API
+
     private void Awake()
     {
         EventsManager.AddHealthEmptiedListener(HandleHealthEmptiedEvent);
@@ -16,13 +18,18 @@ public class Gameplay : MonoBehaviour
         }
     }
 
-    private void HandleHealthEmptiedEvent(Fighter.Name fighterName)
+    #endregion
+
+    #region Events Handlers
+
+    private void HandleHealthEmptiedEvent(FighterType fighterName)
     {
-        Fighter.Name winner = (fighterName == Fighter.Name.Enemy) ? 
-            Fighter.Name.Player : Fighter.Name.Enemy;
+        FighterType winner = (fighterName == FighterType.Enemy) ? FighterType.Player : FighterType.Enemy;
         MenuManager.GoToMenu(MenuName.Gameover);
         GameObject GOM = GameObject.FindGameObjectWithTag("GameoverMenu");
-        GOM.GetComponent<GameoverMenu>().winner = winner;
+        GOM.GetComponent<GameoverMenu>().Winner = winner;
     }
+
+    #endregion
 
 }

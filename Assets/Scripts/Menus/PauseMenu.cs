@@ -3,7 +3,13 @@
 public class PauseMenu : MonoBehaviour
 {
 
+    #region Fields
+
     private float timeScale;
+
+    #endregion
+
+    #region Unity API
 
     private void Start()
     {
@@ -18,6 +24,10 @@ public class PauseMenu : MonoBehaviour
             HandleReturnButtonOnClickEvent();
         }
     }
+
+    #endregion
+
+    #region Events Handlers
 
     public void HandleHelpButtonOnClickEvent()
     {
@@ -35,5 +45,7 @@ public class PauseMenu : MonoBehaviour
         Time.timeScale = timeScale;
         Application.Quit();
     }
+
+    #endregion
 
 }
